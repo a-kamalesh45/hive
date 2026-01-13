@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import LandingPage from './components/LandingPage';
-import Login from './components/Login';
-import Signup from './components/Signup';
-import Pricing from './components/Pricing';
-import Contact from './components/Contact';
+import LandingPage from './pages/LandingPage';
+import Login from './pages/LoginPage';
+import Signup from './pages/SignupPage';
+import Pricing from './pages/PricingPage';
+import Contact from './pages/ContactPage';
 import DashboardPage from './pages/DashboardPage';
 import Layout from './components/Layout';
-import AddQuery from './components/AddQuery';
-import Profile from './components/Profile';
+import AddQuery from './pages/AddQueryPage';
+import Profile from './pages/ProfilePage';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');

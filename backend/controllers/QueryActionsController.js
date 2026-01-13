@@ -39,7 +39,7 @@ const resolveQuery = async (req, res) => {
         // Update the assignee's stats if query was assigned
         if (query.assignedTo) {
             await Member.findByIdAndUpdate(query.assignedTo, {
-                $inc: { queriesResolved: 1 }
+                $inc: { queriesResolved: 1, queriesTaken: -1 }
             });
         }
 
@@ -96,6 +96,13 @@ const dismantleQuery = async (req, res) => {
         query.status = 'Dismantled';
         query.reply = reason || 'Query has been dismantled';
         await query.save();
+
+        // Update the assignee's stats if query was assigned
+        if (query.assignedTo) {
+            await Member.findByIdAndUpdate(query.assignedTo, {
+                $inc: { queriesTaken: -1 }
+            });
+        }
 
         const updatedQuery = await Query.findById(queryId)
             .populate('askedBy', 'name email')

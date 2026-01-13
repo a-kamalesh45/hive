@@ -1,4 +1,4 @@
-import { HexagonBackground } from './hexabg';
+import { HexagonBackground } from '../components/hexabg';
 // Using slightly different icons to better match the reference image look
 import { MagnifyingGlassCircleIcon, ChartBarSquareIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
 

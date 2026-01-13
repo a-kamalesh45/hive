@@ -13,14 +13,15 @@ const AddQuery = () => {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        // Get user ID from localStorage or cookies
+        // Get user ID from localStorage
         const user = localStorage.getItem('user');
         if (user) {
             try {
                 const userData = JSON.parse(user);
-                setUserId(userData.id);
+                setUserId(userData._id); // Use _id instead of id
             } catch (err) {
                 console.error('Failed to parse user data:', err);
+                setError('User session invalid. Please login again.');
             }
         }
     }, []);

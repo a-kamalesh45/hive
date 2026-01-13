@@ -1,17 +1,68 @@
 // Navbar.jsx
-import { useState } from 'react';
-import { 
-    Bars3Icon, 
-    XMarkIcon, 
+import { useState, useEffect } from 'react';
+import {
+    Bars3Icon,
+    XMarkIcon,
     UserCircleIcon,
     PlusIcon,
     ArrowRightStartOnRectangleIcon
 } from '@heroicons/react/24/outline';
-import logo from '../assets/logo2.png'; 
+import logo from '../assets/logo2.png';
 
 const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // Toggle this to test states
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userName, setUserName] = useState('');
+    const [userRole, setUserRole] = useState('User');
+
+    useEffect(() => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+
+        if (token && user) {
+            try {
+                const userData = JSON.parse(user);
+                setIsLoggedIn(true);
+                setUserName(userData.name || 'User');
+                setUserRole(userData.role || 'User');
+            } catch (err) {
+                console.error('Error parsing user data:', err);
+            }
+        } else {
+            setIsLoggedIn(false);
+        }
+
+        // Listen for storage changes (login/logout from other tabs)
+        const handleStorageChange = () => {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (token && user) {
+                try {
+                    const userData = JSON.parse(user);
+                    setIsLoggedIn(true);
+                    setUserName(userData.name || 'User');
+                    setUserRole(userData.role || 'User');
+                } catch (err) {
+                    console.error('Error parsing user data:', err);
+                }
+            } else {
+                setIsLoggedIn(false);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        window.location.hash = '#home';
+        window.location.reload();
+    };
 
     const navLinks = [
         { name: 'Dashboard', href: '#dashboard' },
@@ -45,7 +96,7 @@ const Navbar = () => {
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className="text-sm font-bold text-gray-400 hover:text-[#1A1A1A] hover:bg-white px-4 py-2 rounded-full transition-all duration-200"
+                                className="text-sm font-bold text-gray-400 px-4 py-2 rounded-full hover:text-[#DCA54C] hover:shadow-[inset_0_-2px_0_0_#DCA54C]  transition-all duration-200"
                             >
                                 {link.name}
                             </a>
@@ -53,13 +104,15 @@ const Navbar = () => {
                     </div>
 
                     {/* "Add Query" - The 'Eye Catchy' 3D Button */}
-                    <a
-                        href="#add-query"
-                        className="flex items-center gap-2 text-sm font-black text-[#1A1A1A] bg-[#DCA54C] border-2 border-white px-5 py-2 rounded-full shadow-[4px_4px_0px_0px_#FFFFFF] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_#FFFFFF] transition-all"
-                    >
-                        <PlusIcon className="w-5 h-5 stroke-[3]" />
-                        ADD QUERY
-                    </a>
+                    {isLoggedIn && (
+                        <a
+                            href="#add-query"
+                            className="flex items-center gap-2 text-sm font-black text-[#1A1A1A] bg-[#6c6c6c] border-2 border-[#DCA54C] px-5 py-2 rounded-full shadow-[4px_4px_0px_0px_#FFFFFF] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_#FFFFFF] hover:border-[#DCA54C] hover:bg-[#3A3A3Atransition-all"
+                        >
+                            <PlusIcon className="w-5 h-5 stroke-3" />
+                            ADD QUERY
+                        </a>
+                    )}
                 </div>
 
                 {/* --- 3. RIGHT: AUTH --- */}
@@ -67,15 +120,18 @@ const Navbar = () => {
                     {isLoggedIn ? (
                         // LOGGED IN: Profile + Logout
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-3 bg-[#2A2A2A] border border-[#DCA54C]/30 px-3 py-1.5 rounded-full">
-                                <span className="text-sm font-bold text-[#DCA54C] px-1">Dev_User</span>
+                            <a
+                                href="#profile"
+                                className="flex items-center gap-3 bg-[#2A2A2A] border border-[#DCA54C]/30 px-3 py-1.5 rounded-full hover:border-[#DCA54C] hover:bg-[#3A3A3A] transition-all"
+                            >
+                                <span className="text-sm font-bold text-[#DCA54C] px-1">{userName}</span>
                                 <div className="w-8 h-8 rounded-full bg-[#DCA54C] flex items-center justify-center border border-white">
                                     <UserCircleIcon className="w-6 h-6 text-[#1A1A1A]" />
                                 </div>
-                            </div>
-                            <button 
-                                onClick={() => setIsLoggedIn(false)}
-                                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                            </a>
+                            <button
+                                onClick={handleLogout}
+                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
                                 title="Logout"
                             >
                                 <ArrowRightStartOnRectangleIcon className="w-6 h-6" />
@@ -86,17 +142,16 @@ const Navbar = () => {
                         <>
                             <a
                                 href="#login"
-                                onClick={() => setIsLoggedIn(true)} 
-                                className="text-sm font-bold text-gray-300 hover:text-white px-2 hover:underline decoration-[#DCA54C] decoration-2 underline-offset-4 transition-all"
+                                className="text-sm font-bold text-gray-300 hover:text-[#DCA54C] px-2 hover:underline decoration-[#DCA54C] decoration-2 underline-offset-4 transition-all"
                             >
-                                Login
+                                Sign In
                             </a>
                             <a
                                 href="#signup"
                                 // White 3D Button for Signup
                                 className="text-sm font-bold text-[#1A1A1A] bg-white border-2 border-[#DCA54C] px-6 py-2 rounded-full shadow-[4px_4px_0px_0px_#DCA54C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_#DCA54C] transition-all"
                             >
-                                Signup
+                                Sign Up
                             </a>
                         </>
                     )}
@@ -126,22 +181,38 @@ const Navbar = () => {
                             {link.name}
                         </a>
                     ))}
-                    
+
                     <div className="h-0.5 bg-[#333] w-full my-2"></div>
 
-                    <a href="#add-query" className="text-center font-black text-[#1A1A1A] bg-[#DCA54C] border-2 border-white py-3 rounded-xl shadow-[4px_4px_0px_0px_#FFFFFF] active:shadow-none active:translate-y-1 transition-all">
-                        + ADD QUERY
-                    </a>
+                    {isLoggedIn && (
+                        <a href="#add-query" className="text-center font-black text-[#1A1A1A] bg-[#DCA54C] border-2 border-white py-3 rounded-xl shadow-[4px_4px_0px_0px_#FFFFFF] active:shadow-none active:translate-y-1 transition-all">
+                            + ADD QUERY
+                        </a>
+                    )}
 
                     {!isLoggedIn ? (
                         <div className="grid grid-cols-2 gap-4 mt-2">
-                            <a href="#login" onClick={() => setIsLoggedIn(true)} className="text-center font-bold text-white border-2 border-gray-600 py-3 rounded-xl">Login</a>
-                            <a href="#signup" className="text-center font-bold text-[#1A1A1A] bg-white border-2 border-[#DCA54C] py-3 rounded-xl shadow-[4px_4px_0px_0px_#DCA54C]">Signup</a>
+                            <a href="#login" className="text-center font-bold text-white border-2 border-gray-600 py-3 rounded-xl">Sign In</a>
+                            <a href="#signup" className="text-center font-bold text-[#1A1A1A] bg-white border-2 border-[#DCA54C] py-3 rounded-xl shadow-[4px_4px_0px_0px_#DCA54C]">Sign Up</a>
                         </div>
                     ) : (
-                        <button onClick={() => setIsLoggedIn(false)} className="text-center font-bold text-red-400 border-2 border-red-900/50 bg-red-900/10 py-3 rounded-xl mt-2">
-                            Logout
-                        </button>
+                        <div className="flex flex-col gap-3 mt-2">
+                            <div className="flex items-center gap-2 bg-[#2A2A2A] border border-[#DCA54C]/30 px-3 py-2 rounded-lg">
+                                <span className="text-sm font-bold text-[#DCA54C] flex-1">{userName}</span>
+                                <div className="w-6 h-6 rounded-full bg-[#DCA54C] flex items-center justify-center border border-white">
+                                    <UserCircleIcon className="w-4 h-4 text-[#1A1A1A]" />
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="text-center font-bold text-red-400 border-2 border-red-900/50 bg-red-900/10 py-3 rounded-xl hover:bg-red-900/20 transition-all"
+                            >
+                                Logout
+                            </button>
+                        </div>
                     )}
                 </div>
             )}

@@ -88,10 +88,10 @@ const HexagonBackground = ({
                                             : "before:bg-amber-900/5", // Lighter, warmer border
 
                                         // Inner fill for "honey" hexes - warmer gold tones
-                                        "after:content-[''] after:absolute after:inset-[2px]",
+                                        "after:content-[''] after:absolute after:inset-0.5",
                                         'after:[clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)]',
                                         isFilled
-                                            ? "after:bg-gradient-to-br after:from-[#E6C785] after:to-[#D4AF5F] after:opacity-90"
+                                            ? "after:bg-linear-to-br after:from-[#E6C785] after:to-[#D4AF5F] after:opacity-90"
                                             : "after:bg-transparent",
 
                                         // No hover effect in the static image design
