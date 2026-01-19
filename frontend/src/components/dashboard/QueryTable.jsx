@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-    ClockIcon, 
-    CheckCircleIcon, 
-    XCircleIcon, 
+import {
+    ClockIcon,
+    CheckCircleIcon,
+    XCircleIcon,
     UserCircleIcon,
     ArrowPathIcon,
     ArrowRightIcon
@@ -90,7 +90,7 @@ const ActionButton = ({ onClick, label, icon: Icon, variant = 'neutral', title }
 const getUserAvatarStyle = (userId) => {
     const hash = userId ? userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
     // Strictly toggle between 0 and 1
-    const variant = hash % 2; 
+    const variant = hash % 2;
 
     if (variant === 0) {
         // Option A: Yellow BG, Black Bee (Normal)
@@ -105,7 +105,7 @@ const getUserAvatarStyle = (userId) => {
             bg: 'bg-gray-900',
             ring: 'ring-gray-400',
             // Complex filter to turn black SVG to Amber-400
-            filter: 'invert(83%) sepia(35%) saturate(1469%) hue-rotate(359deg) brightness(101%) contrast(106%)' 
+            filter: 'invert(83%) sepia(35%) saturate(1469%) hue-rotate(359deg) brightness(101%) contrast(106%)'
         };
     }
 };
@@ -143,8 +143,8 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                         const isInactive = isResolved || isDismantled;
 
                         return (
-                            <tr 
-                                key={query._id} 
+                            <tr
+                                key={query._id}
                                 className={`
                                     group transition-colors duration-150
                                     ${isInactive ? 'bg-gray-50/50' : 'hover:bg-amber-50/20'}
@@ -172,9 +172,9 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                             ring-2 ring-offset-1 ring-offset-white ${avatarStyle.ring} ${avatarStyle.bg}
                                             shadow-sm
                                         `}>
-                                            <img 
-                                                src={bee1Svg} 
-                                                alt="" 
+                                            <img
+                                                src={bee1Svg}
+                                                alt=""
                                                 className="w-5 h-5"
                                                 style={{ filter: avatarStyle.filter }}
                                             />
@@ -205,14 +205,14 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                 {/* Actions Area */}
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end items-center h-full min-h-[40px]">
-                                        
+
                                         {/* State 1: Show Outcome Message if Inactive */}
                                         {isInactive ? (
                                             query.reply ? (
                                                 <div className={`
                                                     flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium max-w-[220px] ml-auto
-                                                    ${isResolved 
-                                                        ? 'bg-emerald-50/50 border-emerald-100 text-emerald-700' 
+                                                    ${isResolved
+                                                        ? 'bg-emerald-50/50 border-emerald-100 text-emerald-700'
                                                         : 'bg-rose-50/50 border-rose-100 text-rose-700'}
                                                 `}>
                                                     {/* <span className="uppercase font-bold text-[10px] opacity-70">
@@ -238,7 +238,7 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
 
                                                 {/* Details Button (User) */}
                                                 {userRole === 'User' && (
-                                                    <ActionButton 
+                                                    <ActionButton
                                                         onClick={() => onViewDetails && onViewDetails(query)}
                                                         label="Details"
                                                         icon={ArrowRightIcon}
@@ -248,14 +248,14 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                                 {/* Head/Admin Actions */}
                                                 {userRole === 'Head' && query.assignedTo?._id === userId && (
                                                     <>
-                                                        <ActionButton 
+                                                        <ActionButton
                                                             onClick={() => onOpenModal(query, 'dismantle')}
                                                             label="Dismantle"
                                                             icon={XCircleIcon}
                                                             variant="danger"
                                                         />
 
-                                                        <ActionButton 
+                                                        <ActionButton
                                                             onClick={() => onOpenModal(query, 'resolve')}
                                                             label="Resolve"
                                                             icon={CheckCircleIcon}
@@ -266,21 +266,21 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
 
                                                 {userRole === 'Admin' && (
                                                     <>
-                                                        <ActionButton 
+                                                        <ActionButton
                                                             onClick={() => onOpenModal(query, 'dismantle')}
                                                             label="Dismantle"
                                                             icon={XCircleIcon}
                                                             variant="danger"
                                                         />
-                                                        
-                                                        <ActionButton 
+
+                                                        <ActionButton
                                                             onClick={() => onOpenModal(query, 'assign')}
                                                             label={query.assignedTo ? "Reassign" : "Assign"}
                                                             icon={query.assignedTo ? ArrowPathIcon : UserCircleIcon}
                                                             variant="action"
                                                         />
 
-                                                        <ActionButton 
+                                                        <ActionButton
                                                             onClick={() => onOpenModal(query, 'resolve')}
                                                             label="Resolve"
                                                             icon={CheckCircleIcon}

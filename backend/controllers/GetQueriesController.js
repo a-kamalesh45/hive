@@ -30,17 +30,17 @@ const getQueries = async (req, res) => {
             sortedQueries = queries.sort((a, b) => {
                 const aAssignedToMe = a.assignedTo?._id?.toString() === userId.toString() && a.status === 'Assigned';
                 const bAssignedToMe = b.assignedTo?._id?.toString() === userId.toString() && b.status === 'Assigned';
-                
+
                 // Prioritize queries assigned to me first
                 if (aAssignedToMe && !bAssignedToMe) return -1;
                 if (!aAssignedToMe && bAssignedToMe) return 1;
-                
+
                 // For remaining queries: Resolved > Dismantled > Assigned (to others) > Unassigned
                 const statusOrder = { 'Resolved': 1, 'Dismantled': 2, 'Assigned': 3, 'Unassigned': 4 };
                 const orderA = statusOrder[a.status] || 999;
                 const orderB = statusOrder[b.status] || 999;
                 if (orderA !== orderB) return orderA - orderB;
-                
+
                 return new Date(b.createdAt) - new Date(a.createdAt); // Secondary: newest first
             });
         } else if (userRole === 'Admin') {

@@ -48,10 +48,10 @@ const resolveQuery = async (req, res) => {
         // STATS UPDATE - Resolution Ownership Rule:
         // - If admin resolves, credit admin (regardless of assignment)
         // - If head resolves their own query, credit head
-        
+
         const resolverId = req.user._id; // Person who is resolving
         const wasAssigned = query.assignedTo;
-        
+
         if (req.user.role === 'Admin') {
             // Admin resolves: credit admin, decrement assignee's queriesTaken if it was assigned
             await Member.findByIdAndUpdate(
@@ -59,7 +59,7 @@ const resolveQuery = async (req, res) => {
                 { $inc: { queriesResolved: 1 } },
                 { new: true }
             );
-            
+
             if (wasAssigned) {
                 // Decrement the assigned head's queriesTaken
                 await Member.findByIdAndUpdate(

@@ -45,7 +45,7 @@ const DashboardPage = () => {
             setLoading(true);
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
-            
+
             // Redirect to login if no token
             if (!token) {
                 window.location.hash = '#login';
@@ -72,7 +72,7 @@ const DashboardPage = () => {
             ]);
 
             // Check for unauthorized responses
-            if (queriesRes.status === 401 || statsRes.status === 401 || 
+            if (queriesRes.status === 401 || statsRes.status === 401 ||
                 leaderboardRes.status === 401 || headsRes.status === 401) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
@@ -107,7 +107,7 @@ const DashboardPage = () => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
-            
+
             if (!token) {
                 window.location.hash = '#login';
                 return;
@@ -150,7 +150,7 @@ const DashboardPage = () => {
             setActionLoading(true);
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
-            
+
             if (!token) {
                 window.location.hash = '#login';
                 return;

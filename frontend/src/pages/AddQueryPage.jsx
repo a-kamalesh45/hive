@@ -54,7 +54,7 @@ const AddQuery = () => {
 
         try {
             const token = localStorage.getItem('token');
-            
+
             if (!token) {
                 setError('Please login to submit a query');
                 setTimeout(() => window.location.hash = '#login', 2000);
