@@ -71,7 +71,7 @@ const Navbar = () => {
     ];
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-8 px-4 font-sans">
+        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 px-4 font-sans">
             <nav
                 // 3D STYLE: Thick Gold Border + Hard Gold Shadow
                 className="w-full max-w-7xl bg-[#1A1A1A] border-2 border-[#DCA54C] rounded-full shadow-[6px_6px_0px_0px_#DCA54C] py-3 px-6 md:px-8 flex items-center justify-between transition-transform duration-200"
@@ -96,7 +96,13 @@ const Navbar = () => {
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className="text-sm font-bold text-gray-400 px-4 py-2 rounded-full hover:text-[#DCA54C] hover:shadow-[inset_0_-2px_0_0_#DCA54C]  transition-all duration-200"
+                                className="text-sm font-bold text-gray-400 px-4 py-2 rounded-full
+           hover:text-[#DCA54C]
+           hover:shadow-[inset_0_-2px_0_0_#DCA54C]
+           active:scale-95
+           active:shadow-[inset_0_0_0_2px_#DCA54C]
+           transition-all duration-150"
+
                             >
                                 {link.name}
                             </a>
@@ -107,11 +113,22 @@ const Navbar = () => {
                     {isLoggedIn && (
                         <a
                             href="#add-query"
-                            className="flex items-center gap-2 text-sm font-black text-[#1A1A1A] bg-[#6c6c6c] border-2 border-[#DCA54C] px-5 py-2 rounded-full shadow-[4px_4px_0px_0px_#FFFFFF] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_#FFFFFF] hover:border-[#DCA54C] hover:bg-[#3A3A3Atransition-all"
+                            className="flex items-center gap-2 text-sm font-black
+                            text-[#DCA54C]
+                            bg-[#1F1F1F]
+                            border-2 border-[#000000]
+                            px-5 py-2 rounded-full
+                            shadow-[3px_3px_0px_0px_#dca54c]
+                            hover:translate-x-[2px] hover:translate-y-[2px]
+                            hover:shadow-[1px_1px_0px_0px_#3A2A0A]
+                            active:translate-x-[3px] active:translate-y-[3px]
+                            active:shadow-none
+                            transition-all"
                         >
-                            <PlusIcon className="w-5 h-5 stroke-3" />
+                            <PlusIcon className="w-5 h-5 stroke-3 text-[#DCA54C]" />
                             ADD QUERY
                         </a>
+
                     )}
                 </div>
 

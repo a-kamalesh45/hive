@@ -15,7 +15,9 @@ const resolveQuery = async (req, res) => {
             });
         }
 
-        // If user is a Head, they can only resolve queries assigned to them
+        // PERMISSION CHECK:
+        // - Head: Can only resolve queries assigned to them
+        // - Admin: Can resolve any query (assigned or unassigned)
         if (req.user.role === 'Head') {
             if (!query.assignedTo || query.assignedTo.toString() !== req.user._id.toString()) {
                 return res.status(403).json({
@@ -32,20 +34,52 @@ const resolveQuery = async (req, res) => {
             });
         }
 
+        if (query.status === 'Dismantled') {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot resolve a dismantled query'
+            });
+        }
+
         query.status = 'Resolved';
         query.reply = reply || 'Query has been resolved';
         await query.save();
 
-        // Update the assignee's stats if query was assigned
-        if (query.assignedTo) {
-            await Member.findByIdAndUpdate(query.assignedTo, {
-                $inc: { queriesResolved: 1, queriesTaken: -1 }
-            });
+        // STATS UPDATE - Resolution Ownership Rule:
+        // - If admin resolves, credit admin (regardless of assignment)
+        // - If head resolves their own query, credit head
+        
+        const resolverId = req.user._id; // Person who is resolving
+        const wasAssigned = query.assignedTo;
+        
+        if (req.user.role === 'Admin') {
+            // Admin resolves: credit admin, decrement assignee's queriesTaken if it was assigned
+            await Member.findByIdAndUpdate(
+                resolverId,
+                { $inc: { queriesResolved: 1 } },
+                { new: true }
+            );
+            
+            if (wasAssigned) {
+                // Decrement the assigned head's queriesTaken
+                await Member.findByIdAndUpdate(
+                    wasAssigned,
+                    { $inc: { queriesTaken: -1 } },
+                    { new: true }
+                );
+            }
+        } else if (req.user.role === 'Head' && wasAssigned) {
+            // Head resolves their own assigned query: credit head
+            await Member.findByIdAndUpdate(
+                resolverId,
+                { $inc: { queriesResolved: 1, queriesTaken: -1 } },
+                { new: true }
+            );
         }
 
         const updatedQuery = await Query.findById(queryId)
-            .populate('askedBy', 'name email')
-            .populate('assignedTo', 'name email');
+            .populate('askedBy', 'name email role')
+            .populate('assignedTo', 'name email role');
 
         return res.status(200).json({
             success: true,
@@ -76,7 +110,9 @@ const dismantleQuery = async (req, res) => {
             });
         }
 
-        // If user is a Head, they can only dismantle queries assigned to them
+        // PERMISSION CHECK:
+        // - Head: Can only dismantle queries assigned to them
+        // - Admin: Can dismantle any query (assigned or unassigned)
         if (req.user.role === 'Head') {
             if (!query.assignedTo || query.assignedTo.toString() !== req.user._id.toString()) {
                 return res.status(403).json({
@@ -93,6 +129,13 @@ const dismantleQuery = async (req, res) => {
             });
         }
 
+        if (query.status === 'Resolved') {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot dismantle a resolved query'
+            });
+        }
+
         query.status = 'Dismantled';
         query.reply = reason || 'Query has been dismantled';
         await query.save();
@@ -105,8 +148,8 @@ const dismantleQuery = async (req, res) => {
         }
 
         const updatedQuery = await Query.findById(queryId)
-            .populate('askedBy', 'name email')
-            .populate('assignedTo', 'name email');
+            .populate('askedBy', 'name email role')
+            .populate('assignedTo', 'name email role');
 
         return res.status(200).json({
             success: true,
@@ -202,7 +245,7 @@ const assignQuery = async (req, res) => {
     }
 };
 
-// Get available heads (Admin only)
+// Get available heads (all authenticated users)
 const getHeads = async (req, res) => {
     try {
         const heads = await Member.find({
@@ -224,9 +267,49 @@ const getHeads = async (req, res) => {
     }
 };
 
+// Get leaderboard (all authenticated users)
+const getLeaderboard = async (req, res) => {
+    try {
+        const leaderboard = await Member.find({
+            role: { $in: ['Head', 'Admin'] }
+        })
+            .select('name email role queriesResolved')
+            .sort({ queriesResolved: -1 })
+            .limit(10);
+
+        console.log('Leaderboard raw data:', leaderboard.map(h => ({
+            name: h.name,
+            queriesResolved: h.queriesResolved
+        })));
+
+        // Add resolvedCount for frontend compatibility
+        const formattedLeaderboard = leaderboard.map(head => ({
+            _id: head._id,
+            name: head.name,
+            email: head.email,
+            role: head.role,
+            resolvedCount: head.queriesResolved || 0
+        }));
+
+        return res.status(200).json({
+            success: true,
+            count: formattedLeaderboard.length,
+            leaderboard: formattedLeaderboard
+        });
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch leaderboard',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     resolveQuery,
     dismantleQuery,
     assignQuery,
-    getHeads
+    getHeads,
+    getLeaderboard
 };

@@ -9,7 +9,7 @@ const LandingPage = () => {
             <div className="relative w-full min-h-screen flex flex-col px-4 sm:px-6 lg:px-8 pt-32 pb-12">
 
                 {/* Main Hero Content - Centered text layout */}
-                <div className="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center items-start text-left">
+                <div className="max-w-4xl mx-auto w-full grow flex flex-col justify-center items-start text-left">
                     
                     <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tight leading-[1.1] mb-6">
                         HIVE: Your Query

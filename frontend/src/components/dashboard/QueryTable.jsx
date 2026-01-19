@@ -246,7 +246,25 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                                 )}
 
                                                 {/* Head/Admin Actions */}
-                                                {(userRole === 'Admin' || (userRole === 'Head' && query.assignedTo?._id === userId)) && (
+                                                {userRole === 'Head' && query.assignedTo?._id === userId && (
+                                                    <>
+                                                        <ActionButton 
+                                                            onClick={() => onOpenModal(query, 'dismantle')}
+                                                            label="Dismantle"
+                                                            icon={XCircleIcon}
+                                                            variant="danger"
+                                                        />
+
+                                                        <ActionButton 
+                                                            onClick={() => onOpenModal(query, 'resolve')}
+                                                            label="Resolve"
+                                                            icon={CheckCircleIcon}
+                                                            variant="primary"
+                                                        />
+                                                    </>
+                                                )}
+
+                                                {userRole === 'Admin' && (
                                                     <>
                                                         <ActionButton 
                                                             onClick={() => onOpenModal(query, 'dismantle')}
@@ -255,15 +273,12 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                                             variant="danger"
                                                         />
                                                         
-                                                        {userRole === 'Admin' && (
-                                                            <ActionButton 
-                                                                onClick={() => onOpenModal(query, 'assign')}
-                                                                // Label length differs, but Button width is fixed by CSS
-                                                                label={query.assignedTo ? "Reassign" : "Assign"}
-                                                                icon={userRole === 'Admin' && query.assignedTo ? ArrowPathIcon : UserCircleIcon}
-                                                                variant="action"
-                                                            />
-                                                        )}
+                                                        <ActionButton 
+                                                            onClick={() => onOpenModal(query, 'assign')}
+                                                            label={query.assignedTo ? "Reassign" : "Assign"}
+                                                            icon={query.assignedTo ? ArrowPathIcon : UserCircleIcon}
+                                                            variant="action"
+                                                        />
 
                                                         <ActionButton 
                                                             onClick={() => onOpenModal(query, 'resolve')}

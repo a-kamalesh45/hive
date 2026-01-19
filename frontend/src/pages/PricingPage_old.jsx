@@ -3,7 +3,6 @@ import {
     CheckIcon,
     SparklesIcon
 } from '@heroicons/react/24/outline';
-import beePng from '../assets/bee.png';
 
 const Pricing = () => {
     const plans = [
@@ -20,7 +19,8 @@ const Pricing = () => {
                 "Mobile app access"
             ],
             cta: "Start Free Trial",
-            popular: false
+            popular: false,
+            gradient: "from-slate-700 to-slate-800"
         },
         {
             name: "Professional",
@@ -37,7 +37,8 @@ const Pricing = () => {
                 "Custom workflows"
             ],
             cta: "Start Free Trial",
-            popular: true
+            popular: true,
+            gradient: "from-indigo-600 to-violet-600"
         },
         {
             name: "Enterprise",
@@ -56,33 +57,26 @@ const Pricing = () => {
                 "Dedicated account manager"
             ],
             cta: "Contact Sales",
-            popular: false
+            popular: false,
+            gradient: "from-violet-700 to-purple-700"
         }
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#FDFBF7] via-white to-[#FFF9F0] py-20 px-4 relative overflow-hidden">
-            {/* Hexagon Background */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='%23F59E0B' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-                backgroundSize: '60px 52px'
-            }} />
-            <img src={beePng} alt="" className="absolute top-20 right-10 w-40 h-40 opacity-[0.02] pointer-events-none" />
-            <img src={beePng} alt="" className="absolute bottom-20 left-10 w-32 h-32 opacity-[0.02] pointer-events-none" />
-            
-            <div className="max-w-7xl mx-auto relative z-10">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-20 px-4">
+            <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-16">
                     <div className="mb-6">
-                        <span className="inline-flex items-center px-4 py-2 bg-amber-100 border-2 border-amber-300 rounded-full text-amber-800 text-sm font-semibold shadow-md">
+                        <span className="inline-flex items-center px-4 py-2 bg-indigo-600 bg-opacity-20 border border-indigo-500 border-opacity-30 rounded-full text-indigo-400 text-sm font-medium">
                             <SparklesIcon className="w-4 h-4 mr-2" />
                             Simple, Transparent Pricing
                         </span>
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                    <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
                         Choose Your Plan
                     </h1>
-                    <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+                    <p className="text-xl text-slate-400 max-w-3xl mx-auto">
                         Start with a 14-day free trial. No credit card required. Cancel anytime.
                     </p>
                 </div>
@@ -97,45 +91,45 @@ const Pricing = () => {
                         >
                             {plan.popular && (
                                 <div className="absolute -top-5 left-0 right-0 flex justify-center">
-                                    <span className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                                        MOST POPULAR 🐝
+                                    <span className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                                        MOST POPULAR
                                     </span>
                                 </div>
                             )}
 
                             <div
-                                className={`h-full bg-white/90 backdrop-blur-md border-2 ${plan.popular ? 'border-amber-400' : 'border-amber-200'
-                                    } rounded-2xl p-8 hover:border-amber-300 transition-all duration-300 ${plan.popular ? 'shadow-2xl shadow-amber-500/20' : 'shadow-lg'
+                                className={`h-full bg-slate-900 bg-opacity-50 backdrop-blur-md border ${plan.popular ? 'border-indigo-500 border-opacity-50' : 'border-slate-800'
+                                    } rounded-2xl p-8 hover:border-slate-700 transition-all duration-300 ${plan.popular ? 'shadow-2xl shadow-indigo-500/20' : ''
                                     }`}
                             >
                                 <div className="mb-8">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                                    <p className="text-gray-600 text-sm">{plan.description}</p>
+                                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                                    <p className="text-slate-400 text-sm">{plan.description}</p>
                                 </div>
 
                                 <div className="mb-8">
                                     <div className="flex items-baseline">
-                                        <span className="text-5xl font-bold text-gray-900">${plan.price}</span>
-                                        <span className="text-gray-600 ml-2">/month</span>
+                                        <span className="text-5xl font-bold text-white">${plan.price}</span>
+                                        <span className="text-slate-400 ml-2">/month</span>
                                     </div>
                                 </div>
 
                                 <a
                                     href={plan.name === 'Enterprise' ? '#contact' : '#dashboard'}
                                     className={`block w-full py-3.5 px-6 text-center font-semibold rounded-xl transition-all duration-300 mb-8 ${plan.popular
-                                            ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transform hover:scale-105'
-                                            : 'bg-white hover:bg-amber-50 text-amber-700 border-2 border-amber-300 hover:border-amber-400'
+                                            ? 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transform hover:scale-105'
+                                            : 'bg-slate-800 bg-opacity-50 hover:bg-opacity-70 text-white border border-slate-700 hover:border-slate-600'
                                         }`}
                                 >
                                     {plan.cta}
                                 </a>
 
                                 <div className="space-y-4">
-                                    <div className="text-sm font-semibold text-gray-900 mb-4">What's included:</div>
+                                    <div className="text-sm font-semibold text-slate-300 mb-4">What's included:</div>
                                     {plan.features.map((feature, featureIdx) => (
                                         <div key={featureIdx} className="flex items-start">
-                                            <CheckIcon className="w-5 h-5 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
-                                            <span className="text-gray-700 text-sm">{feature}</span>
+                                            <CheckIcon className="w-5 h-5 text-indigo-400 mr-3 flex-shrink-0 mt-0.5" />
+                                            <span className="text-slate-300 text-sm">{feature}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -146,7 +140,7 @@ const Pricing = () => {
 
                 {/* FAQ Section */}
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+                    <h2 className="text-3xl font-bold text-white text-center mb-12">
                         Frequently Asked Questions
                     </h2>
 
@@ -171,10 +165,10 @@ const Pricing = () => {
                         ].map((faq, idx) => (
                             <div
                                 key={idx}
-                                className="bg-white/90 backdrop-blur-md border-2 border-amber-200 rounded-xl p-6 hover:border-amber-300 transition-all duration-300 shadow-md"
+                                className="bg-slate-900 bg-opacity-50 backdrop-blur-md border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-all duration-300"
                             >
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{faq.q}</h3>
-                                <p className="text-gray-700">{faq.a}</p>
+                                <h3 className="text-lg font-semibold text-white mb-2">{faq.q}</h3>
+                                <p className="text-slate-400">{faq.a}</p>
                             </div>
                         ))}
                     </div>

@@ -7,11 +7,15 @@ const authenticate = (req, res, next) => {
         const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
         if (!token) {
+            console.log('No token found in request');
             return res.status(401).json({
                 success: false,
                 message: 'Authentication required. Please login.'
             });
         }
+
+        // Log token for debugging (first/last 10 chars only for security)
+        console.log('Token received:', token ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}` : 'null');
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded; // { id, email, role }

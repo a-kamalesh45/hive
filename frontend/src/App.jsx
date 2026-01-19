@@ -29,6 +29,13 @@ function App() {
   }, []);
 
   const renderView = () => {
+    // Check if user is logged in for protected routes
+    const isLoggedIn = () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      return !!(token && user);
+    };
+
     switch (currentView) {
       case 'login':
         return <Login />;
@@ -55,6 +62,10 @@ function App() {
         );
 
       case 'dashboard':
+        if (!isLoggedIn()) {
+          window.location.hash = '#login';
+          return <Login />;
+        }
         return (
           <>
             <Navbar />
@@ -64,6 +75,10 @@ function App() {
         );
 
       case 'add-query':
+        if (!isLoggedIn()) {
+          window.location.hash = '#login';
+          return <Login />;
+        }
         return (
           <>
             <Navbar />
@@ -73,6 +88,10 @@ function App() {
         );
 
       case 'profile':
+        if (!isLoggedIn()) {
+          window.location.hash = '#login';
+          return <Login />;
+        }
         return (
           <>
             <Navbar />

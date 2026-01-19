@@ -45,8 +45,14 @@ const DashboardPage = () => {
             setLoading(true);
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
+            
+            // Redirect to login if no token
+            if (!token) {
+                window.location.hash = '#login';
+                return;
+            }
 
-            const [queriesRes, statsRes, leaderboardRes] = await Promise.all([
+            const [queriesRes, statsRes, leaderboardRes, headsRes] = await Promise.all([
                 fetch(`${apiUrl}/api/queries`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                     credentials: 'include'
@@ -58,8 +64,21 @@ const DashboardPage = () => {
                 fetch(`${apiUrl}/api/leaderboard`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                     credentials: 'include'
+                }),
+                fetch(`${apiUrl}/api/heads`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    credentials: 'include'
                 })
             ]);
+
+            // Check for unauthorized responses
+            if (queriesRes.status === 401 || statsRes.status === 401 || 
+                leaderboardRes.status === 401 || headsRes.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.hash = '#login';
+                return;
+            }
 
             if (!queriesRes.ok || !statsRes.ok) {
                 throw new Error('Failed to fetch data');
@@ -68,10 +87,13 @@ const DashboardPage = () => {
             const queriesData = await queriesRes.json();
             const statsData = await statsRes.json();
             const leaderboardData = leaderboardRes.ok ? await leaderboardRes.json() : { leaderboard: [] };
+            const headsData = headsRes.ok ? await headsRes.json() : { heads: [] };
 
             setQueries(queriesData.queries || []);
             setStats(statsData.stats || {});
-            setLeaderboard(leaderboardData.leaderboard || []);
+            // backend may return { leaderboard: [...] } or an array directly
+            setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : (leaderboardData.leaderboard || leaderboardData.data || []));
+            setHeads(headsData.heads || []);
             setError(null);
         } catch (err) {
             console.error('Error fetching dashboard data:', err);
@@ -85,6 +107,11 @@ const DashboardPage = () => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
+            
+            if (!token) {
+                window.location.hash = '#login';
+                return;
+            }
 
             const response = await fetch(`${apiUrl}/api/heads`, {
                 headers: { 'Authorization': `Bearer ${token}` },
@@ -123,6 +150,11 @@ const DashboardPage = () => {
             setActionLoading(true);
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
+            
+            if (!token) {
+                window.location.hash = '#login';
+                return;
+            }
 
             let endpoint = '';
             let body = {};
@@ -147,6 +179,13 @@ const DashboardPage = () => {
                 credentials: 'include',
                 body: JSON.stringify(body)
             });
+
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.hash = '#login';
+                return;
+            }
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -198,23 +237,27 @@ const DashboardPage = () => {
     let tabFilteredQueries = queries;
 
     if (userRole === 'User') {
-        // Users see only their queries from backend
-        // Tab 'all': Show all their queries (all statuses)
-        // Tab 'my-queries': Show only queries they asked (same as 'all' for users)
-        // No additional filtering needed as backend already filters by askedBy
-        // 'all' shows everything from the user
+        // Participants see all queries (backend returns all queries with proper sorting)
+        // Tab 'all': Show all queries
+        // Tab 'my-queries': Show only queries created by the participant
+        if (activeTab === 'my-queries') {
+            tabFilteredQueries = queries.filter(q => q.askedBy?._id === userId);
+        }
+        // 'all' tab shows everything (no filtering)
     } else if (userRole === 'Head') {
-        // Heads see only queries assigned to them from backend
+        // Heads see all queries (backend returns all queries with proper sorting)
         if (activeTab === 'assigned') {
-            // Show only unresolved assigned queries (status = 'Assigned')
-            tabFilteredQueries = queries.filter(q => q.status === 'Assigned');
+            // Show only queries assigned to this head with status 'Assigned'
+            tabFilteredQueries = queries.filter(
+                q => q.status === 'Assigned' && q.assignedTo?._id === userId
+            );
         } else if (activeTab === 'resolved') {
             // Show only resolved queries
             tabFilteredQueries = queries.filter(q => q.status === 'Resolved');
         }
-        // 'all' shows everything assigned to them (both resolved and unresolved)
+        // 'all' tab shows everything (no filtering)
     } else if (userRole === 'Admin') {
-        // Admins see all queries from backend
+        // Admins see all queries (backend returns all queries with proper sorting)
         if (activeTab === 'to-be-assigned') {
             // Show unassigned queries
             tabFilteredQueries = queries.filter(q => q.status === 'Unassigned');
@@ -222,7 +265,7 @@ const DashboardPage = () => {
             // Show resolved queries
             tabFilteredQueries = queries.filter(q => q.status === 'Resolved');
         }
-        // 'all' shows everything
+        // 'all' tab shows everything (no filtering)
     }
 
     const filteredQueries = tabFilteredQueries.filter(query =>
@@ -310,73 +353,6 @@ const DashboardPage = () => {
                         {statsConfig.map((stat, idx) => (
                             <StatsCard key={stat.name} stat={stat} index={idx} />
                         ))}
-                    </div>
-                )}
-
-                {/* Leaderboard Section */}
-                {!loading && !error && leaderboard.length > 0 && (
-                    <div className="bg-white/80 backdrop-blur-sm border border-amber-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 mb-6">
-                        <div className="px-6 py-4 border-b border-amber-100 bg-gradient-to-r from-amber-50/50 to-yellow-50/30">
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <svg className="w-6 h-6 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                Top Contributors
-                            </h2>
-                            <p className="text-sm text-gray-600 mt-1">Heads ranked by resolved queries</p>
-                        </div>
-                        <div className="p-6">
-                            <div className="space-y-3">
-                                {leaderboard.map((head, index) => (
-                                    <div
-                                        key={head._id}
-                                        className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 ${index === 0 ? 'bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-300' :
-                                            index === 1 ? 'bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-gray-300' :
-                                                index === 2 ? 'bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300' :
-                                                    'bg-gray-50 border border-gray-200 hover:bg-gray-100'
-                                            }`}
-                                    >
-                                        {/* Rank Badge */}
-                                        <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${index === 0 ? 'bg-amber-500 text-white shadow-lg' :
-                                            index === 1 ? 'bg-gray-400 text-white shadow-lg' :
-                                                index === 2 ? 'bg-orange-400 text-white shadow-lg' :
-                                                    'bg-gray-300 text-gray-700'
-                                            }`}>
-                                            #{index + 1}
-                                        </div>
-
-                                        {/* Avatar */}
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                            {head.name.charAt(0).toUpperCase()}
-                                        </div>
-
-                                        {/* Name and Email */}
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-gray-900 truncate">{head.name}</p>
-                                            <p className="text-sm text-gray-600 truncate">{head.email}</p>
-                                        </div>
-
-                                        {/* Resolved Count */}
-                                        <div className="flex-shrink-0 text-right">
-                                            <p className="text-2xl font-bold text-gray-900">{head.resolvedCount}</p>
-                                            <p className="text-xs text-gray-600 uppercase tracking-wide">Resolved</p>
-                                        </div>
-
-                                        {/* Trophy Icon for Top 3 */}
-                                        {index < 3 && (
-                                            <div className="flex-shrink-0">
-                                                <svg className={`w-8 h-8 ${index === 0 ? 'text-amber-500' :
-                                                    index === 1 ? 'text-gray-400' :
-                                                        'text-orange-400'
-                                                    }`} fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 )}
 
@@ -547,6 +523,84 @@ const DashboardPage = () => {
                                         >
                                             Next
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Top 3 Heads Leaderboard (under table) */}
+                        {!loading && !error && leaderboard.length > 0 && (
+                            <div className="mt-6 bg-white/80 backdrop-blur-sm border border-amber-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <div className="px-6 py-4 border-b border-amber-100 bg-gradient-to-r from-amber-50/50 to-yellow-50/30">
+                                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <svg className="w-6 h-6 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        🏆 Top Contributors
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mt-1">Our top 3 query resolvers this month</p>
+                                </div>
+                                <div className="p-8">
+                                    <div className="flex flex-col md:flex-row items-end justify-center gap-6">
+                                        {/* Second Place */}
+                                        {leaderboard[1] && (
+                                            <div className="flex flex-col items-center w-full md:w-48 transform md:-translate-y-2">
+                                                <div className="relative mb-4">
+                                                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 flex items-center justify-center text-white font-bold text-2xl shadow-xl border-4 border-white">
+                                                        {leaderboard[1].name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
+                                                        🥈
+                                                    </div>
+                                                </div>
+                                                <h4 className="text-lg font-bold text-gray-900 mb-1">{leaderboard[1].name}</h4>
+                                                <p className="text-sm text-gray-600 mb-2 truncate w-full text-center">{leaderboard[1].email}</p>
+                                                <div className="bg-gradient-to-r from-gray-100 to-gray-200 px-4 py-2 rounded-full">
+                                                    <p className="text-2xl font-bold text-gray-900">{leaderboard[1].resolvedCount}</p>
+                                                    <p className="text-xs text-gray-600 uppercase tracking-wide text-center">Resolved</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* First Place */}
+                                        {leaderboard[0] && (
+                                            <div className="flex flex-col items-center w-full md:w-52">
+                                                <div className="relative mb-4">
+                                                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 flex items-center justify-center text-white font-bold text-3xl shadow-2xl border-4 border-white">
+                                                        {leaderboard[0].name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div className="absolute -top-3 -right-3 w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-xl border-2 border-white">
+                                                        👑
+                                                    </div>
+                                                </div>
+                                                <h4 className="text-xl font-bold text-gray-900 mb-1">{leaderboard[0].name}</h4>
+                                                <p className="text-sm text-gray-600 mb-3 truncate w-full text-center">{leaderboard[0].email}</p>
+                                                <div className="bg-gradient-to-r from-amber-100 to-yellow-100 px-6 py-3 rounded-full border-2 border-amber-300">
+                                                    <p className="text-3xl font-bold text-amber-900">{leaderboard[0].resolvedCount}</p>
+                                                    <p className="text-xs text-amber-700 uppercase tracking-wide text-center font-semibold">Resolved</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Third Place */}
+                                        {leaderboard[2] && (
+                                            <div className="flex flex-col items-center w-full md:w-48 transform md:-translate-y-2">
+                                                <div className="relative mb-4">
+                                                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-300 via-orange-400 to-amber-500 flex items-center justify-center text-white font-bold text-2xl shadow-xl border-4 border-white">
+                                                        {leaderboard[2].name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
+                                                        🥉
+                                                    </div>
+                                                </div>
+                                                <h4 className="text-lg font-bold text-gray-900 mb-1">{leaderboard[2].name}</h4>
+                                                <p className="text-sm text-gray-600 mb-2 truncate w-full text-center">{leaderboard[2].email}</p>
+                                                <div className="bg-gradient-to-r from-orange-100 to-amber-100 px-4 py-2 rounded-full">
+                                                    <p className="text-2xl font-bold text-orange-900">{leaderboard[2].resolvedCount}</p>
+                                                    <p className="text-xs text-orange-700 uppercase tracking-wide text-center">Resolved</p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

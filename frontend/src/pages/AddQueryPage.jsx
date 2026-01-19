@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PlusCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import beePng from '../assets/bee.png';
 
 const AddQuery = () => {
     const [formData, setFormData] = useState({
@@ -53,6 +54,12 @@ const AddQuery = () => {
 
         try {
             const token = localStorage.getItem('token');
+            
+            if (!token) {
+                setError('Please login to submit a query');
+                setTimeout(() => window.location.hash = '#login', 2000);
+                return;
+            }
 
             const response = await fetch('http://localhost:5001/api/add-query', {
                 method: 'POST',
@@ -92,7 +99,13 @@ const AddQuery = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-24 pb-16 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-[#FDFBF7] via-white to-[#FFF9F0] pt-30 pb-16 px-4 relative overflow-hidden">
+            {/* Hexagon/light beehive background (same as dashboard) */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='%23F59E0B' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+                backgroundSize: '60px 52px'
+            }} />
+            <img src={beePng} alt="" className="absolute top-12 right-8 w-32 h-32 opacity-[0.03] pointer-events-none" />
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="mb-8 animate-slide-up">
@@ -105,7 +118,7 @@ const AddQuery = () => {
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200 animate-slide-up delay-100">
+                <div className="bg-white rounded-2xl shadow-lg p-8 border border-amber-100 animate-slide-up delay-100">
                     {/* Success Message */}
                     {success && (
                         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
@@ -142,10 +155,10 @@ const AddQuery = () => {
                                 onChange={handleChange}
                                 required
                                 rows="6"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 resize-none"
+                                className="w-full px-4 py-3 bg-amber-50 border border-amber-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition duration-200 resize-none"
                                 placeholder="Please provide a detailed description of your issue..."
                             />
-                            <p className="mt-2 text-xs text-gray-500">
+                            <p className="mt-2 text-xs text-amber-600">
                                 Be as specific as possible to help us resolve your issue quickly
                             </p>
                         </div>
@@ -195,14 +208,14 @@ const AddQuery = () => {
                             <button
                                 type="button"
                                 onClick={() => window.location.hash = '#dashboard'}
-                                className="px-6 py-3 text-gray-700 hover:text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-all duration-200"
+                                className="px-6 py-3 text-amber-700 hover:text-amber-900 font-medium rounded-lg hover:bg-amber-50 transition-all duration-200"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
+                                className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200"
                             >
                                 {isSubmitting ? (
                                     <>
@@ -221,25 +234,24 @@ const AddQuery = () => {
                             </button>
                         </div>
                     </form>
-                </div>
-
-                {/* Info Card */}
-                <div className="mt-8 bg-indigo-50 rounded-xl p-6 border border-indigo-100 animate-slide-up delay-200">
-                    <h3 className="text-lg font-semibold text-indigo-900 mb-3">What happens next?</h3>
-                    <ul className="space-y-2 text-sm text-indigo-700">
-                        <li className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-1.5 mr-3"></span>
-                            <span>Your query will be reviewed by our team</span>
-                        </li>
-                        <li className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-1.5 mr-3"></span>
-                            <span>You'll receive updates on the dashboard</span>
-                        </li>
-                        <li className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-1.5 mr-3"></span>
-                            <span>Assigned team members will work on resolving your issue</span>
-                        </li>
-                    </ul>
+                    {/* Info Card */}
+                    <div className="mt-8 bg-amber-50 rounded-xl p-6 border border-amber-100 animate-slide-up delay-200">
+                        <h3 className="text-lg font-semibold text-amber-900 mb-3">What happens next?</h3>
+                        <ul className="space-y-2 text-sm text-amber-700">
+                            <li className="flex items-start">
+                                <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-1.5 mr-3"></span>
+                                <span>Your query will be reviewed by our team</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-1.5 mr-3"></span>
+                                <span>You'll receive updates on the dashboard</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-1.5 mr-3"></span>
+                                <span>Assigned team members will work on resolving your issue</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
