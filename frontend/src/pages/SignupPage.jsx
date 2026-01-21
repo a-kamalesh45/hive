@@ -57,6 +57,7 @@ const Signup = () => {
         }
 
         try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const requestBody = {
                 name: formData.name,
                 email: formData.email,
@@ -70,7 +71,7 @@ const Signup = () => {
                 requestBody.pin = formData.pin;
             }
 
-            const response = await fetch('http://localhost:5001/api/signup', {
+            const response = await fetch(`${apiUrl}/api/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ const Signup = () => {
         e && e.preventDefault && e.preventDefault();
         setError('');
         setOtpMessage('');
-        
+
         if (!formData.email) {
             setError('Please enter your email before requesting a verification code');
             return;
@@ -111,7 +112,8 @@ const Signup = () => {
 
         try {
             setSendOtpLoading(true);
-            const response = await fetch('http://localhost:5001/api/send-otp', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+            const response = await fetch(`${apiUrl}/api/send-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: formData.email })

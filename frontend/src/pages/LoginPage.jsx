@@ -8,7 +8,7 @@ const Login = () => {
         role: 'User',
         pin: ''
     });
-    
+
     const [showPin, setShowPin] = useState(false);
 
     const [error, setError] = useState('');
@@ -16,7 +16,7 @@ const Login = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        
+
         if (name === 'role') {
             setShowPin(value === 'Admin' || value === 'Head');
             setFormData({
@@ -37,18 +37,19 @@ const Login = () => {
         e.preventDefault();
 
         try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const requestBody = {
                 email: formData.email,
                 password: formData.password,
                 role: formData.role
             };
-            
+
             // Include PIN only if role is Admin or Head
             if (formData.role === 'Admin' || formData.role === 'Head') {
                 requestBody.pin = formData.pin;
             }
 
-            const response = await fetch('http://localhost:5001/api/login', {
+            const response = await fetch(`${apiUrl}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

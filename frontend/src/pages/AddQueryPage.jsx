@@ -53,6 +53,7 @@ const AddQuery = () => {
         }
 
         try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const token = localStorage.getItem('token');
 
             if (!token) {
@@ -61,7 +62,7 @@ const AddQuery = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:5001/api/add-query', {
+            const response = await fetch(`${apiUrl}/api/add-query`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

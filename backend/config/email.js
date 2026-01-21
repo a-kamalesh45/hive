@@ -207,11 +207,11 @@ const getOTPEmailHTML = (otp, userName = 'User') => {
 
 // HTML template for resolution notifications
 const getResolutionEmailHTML = (query, resolverName = 'Team') => {
-        const title = `Your query has been resolved: ${query.title || 'Query update'}`;
-        const reply = query.reply || 'Your query has been resolved by our team.';
-        const askedBy = (query.askedBy && (query.askedBy.name || query.askedBy.email)) || 'Participant';
+    const title = `Your query has been resolved: ${query.title || 'Query update'}`;
+    const reply = query.reply || 'Your query has been resolved by our team.';
+    const askedBy = (query.askedBy && (query.askedBy.name || query.askedBy.email)) || 'Participant';
 
-        return `
+    return `
         <!DOCTYPE html>
         <html>
         <head>

@@ -21,7 +21,8 @@ const PasswordReset = ({ isOpen, onClose, onSuccess }) => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:5001/api/send-otp', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+            const response = await fetch(`${apiUrl}/api/send-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, requireExistingUser: true })
@@ -88,7 +89,8 @@ const PasswordReset = ({ isOpen, onClose, onSuccess }) => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:5001/api/reset-password', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+            const response = await fetch(`${apiUrl}/api/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp: otpCode, newPassword })
