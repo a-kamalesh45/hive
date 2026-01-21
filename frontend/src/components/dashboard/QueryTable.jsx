@@ -204,13 +204,13 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
 
                                 {/* Actions Area */}
                                 <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end items-center h-full min-h-[40px]">
+                                    <div className="flex justify-end items-center h-full min-h-10">
 
                                         {/* State 1: Show Outcome Message if Inactive */}
                                         {isInactive ? (
                                             query.reply ? (
                                                 <div className={`
-                                                    flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium max-w-[220px] ml-auto
+                                                    flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium max-w-55 ml-auto
                                                     ${isResolved
                                                         ? 'bg-emerald-50/50 border-emerald-100 text-emerald-700'
                                                         : 'bg-rose-50/50 border-rose-100 text-rose-700'}

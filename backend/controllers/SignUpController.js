@@ -1,13 +1,31 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const MEMBER = require('../models/Member.js');
+const { verifyOTP } = require('../config/email');
 
 async function signup(req, res) {
-    const { name, email, password, role, pin } = req.body;
+    const { name, email, password, role, pin, otp } = req.body;
 
     try {
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Name, email, and password are required.' });
+        }
+
+        // REQUIRE EMAIL VERIFICATION via OTP
+        if (!otp) {
+            return res.status(400).json({
+                message: 'Email verification required. Please verify your email first.',
+                requiresVerification: true
+            });
+        }
+
+        // Verify the OTP
+        const otpResult = verifyOTP(email, otp);
+        if (!otpResult.valid) {
+            return res.status(400).json({
+                message: otpResult.message,
+                requiresVerification: true
+            });
         }
 
         // Validate PIN for Admin and Head roles
@@ -39,6 +57,9 @@ async function signup(req, res) {
         });
         await newUser.save();
 
+        // Create user object without password (same structure as login)
+        const { password: _, ...userWithoutPassword } = newUser.toObject();
+
         const token = jwt.sign(
             { id: newUser._id, email: newUser.email, role: newUser.role },
             process.env.JWT_SECRET,
@@ -52,13 +73,8 @@ async function signup(req, res) {
         })
             .status(201)
             .json({
-                message: 'User added successfully',
-                user: {
-                    id: newUser._id,
-                    name,
-                    email,
-                    role: newUser.role
-                },
+                message: 'User registered successfully with verified email',
+                user: userWithoutPassword,
                 token: token
             });
 

@@ -612,145 +612,147 @@ const DashboardPage = () => {
                 {/* Details Modal for Users */}
                 {
                     detailsQuery && (
-                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fadeIn">
-                            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-scaleIn border-2 border-gray-100">
-                                {/* Modal Header */}
-                                <div className="relative bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-5 border-b-2 border-amber-200">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-2xl font-bold text-gray-900">Query Details</h3>
-                                            <p className="text-sm text-gray-600 mt-1">Full information about your query</p>
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99999] p-4 animate-fadeIn overflow-y-auto">
+                            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 animate-scaleIn border-2 border-gray-100">
+                                <div className="max-h-[85vh] overflow-y-auto">
+                                    {/* Modal Header */}
+                                    <div className="relative bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-5 border-b-2 border-amber-200">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-2xl font-bold text-gray-900">Query Details</h3>
+                                                <p className="text-sm text-gray-600 mt-1">Full information about your query</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setDetailsQuery(null)}
+                                                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-all duration-200 hover:scale-110 active:scale-95"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
                                         </div>
+                                    </div>
+
+                                    {/* Modal Body */}
+                                    <div className="p-6 space-y-6">
+                                        {/* Query ID and Status */}
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-gray-50 rounded-xl p-4">
+                                                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Query ID</p>
+                                                <p className="font-mono text-lg font-semibold text-gray-900">{detailsQuery._id.slice(-6).toUpperCase()}</p>
+                                            </div>
+                                            <div className="bg-gray-50 rounded-xl p-4">
+                                                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Status</p>
+                                                <div className="flex items-center">
+                                                    {/* Import PremiumStatusBadge equivalent here */}
+                                                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${detailsQuery.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' :
+                                                        detailsQuery.status === 'Dismantled' ? 'bg-rose-100 text-rose-800' :
+                                                            detailsQuery.status === 'Assigned' ? 'bg-blue-100 text-blue-800' :
+                                                                'bg-amber-100 text-amber-800'
+                                                        }`}>
+                                                        {detailsQuery.status}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Issue Description */}
+                                        <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                                            <p className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-2">Your Query</p>
+                                            <p className="text-gray-900 text-base leading-relaxed">{detailsQuery.issue}</p>
+                                        </div>
+
+                                        {/* Assigned To */}
+                                        {detailsQuery.assignedTo && (
+                                            <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border-2 border-blue-300">
+                                                <p className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3 block">Assigned To</p>
+                                                <div className="flex items-center gap-3 bg-white rounded-lg p-3 border border-blue-100">
+                                                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shrink-0">
+                                                        {detailsQuery.assignedTo.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="font-semibold text-gray-900 truncate">{detailsQuery.assignedTo.name}</p>
+                                                        <p className="text-xs text-gray-500 truncate">{detailsQuery.assignedTo.email}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Resolution or Dismantle Reason */}
+                                        {detailsQuery.status === 'Resolved' && detailsQuery.reply && (
+                                            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border-2 border-emerald-300 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 rounded-full -mr-16 -mt-16"></div>
+                                                <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-200/20 rounded-full -ml-12 -mb-12"></div>
+                                                <div className="relative">
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
+                                                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>
+                                                        <p className="text-sm font-bold text-emerald-900 uppercase tracking-wider">Resolution from {detailsQuery.assignedTo?.name || 'Head'}</p>
+                                                    </div>
+                                                    <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
+                                                        <p className="text-gray-800 text-base leading-relaxed italic">"{detailsQuery.reply}"</p>
+                                                    </div>
+                                                    <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700">
+                                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                                        </svg>
+                                                        <span>Resolved on {new Date(detailsQuery.updatedAt).toLocaleDateString()}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {detailsQuery.status === 'Dismantled' && detailsQuery.reply && (
+                                            <div className="bg-gradient-to-br from-rose-50 to-red-50 rounded-2xl p-5 border-2 border-rose-300 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-200/20 rounded-full -mr-16 -mt-16"></div>
+                                                <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-200/20 rounded-full -ml-12 -mb-12"></div>
+                                                <div className="relative">
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center">
+                                                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </div>
+                                                        <p className="text-sm font-bold text-rose-900 uppercase tracking-wider">Query Dismantled by {detailsQuery.assignedTo?.name || 'Admin'}</p>
+                                                    </div>
+                                                    <div className="bg-white rounded-xl p-4 shadow-sm border border-rose-100">
+                                                        <p className="text-gray-800 text-base leading-relaxed italic">"{detailsQuery.reply}"</p>
+                                                    </div>
+                                                    <div className="mt-3 flex items-center gap-2 text-xs text-rose-700">
+                                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                                        </svg>
+                                                        <span>Dismantled on {new Date(detailsQuery.updatedAt).toLocaleDateString()}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Timestamps */}
+                                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Submitted</p>
+                                                <p className="text-sm text-gray-900">{new Date(detailsQuery.createdAt).toLocaleString()}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Last Updated</p>
+                                                <p className="text-sm text-gray-900">{new Date(detailsQuery.updatedAt).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Modal Footer */}
+                                    <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
                                         <button
                                             onClick={() => setDetailsQuery(null)}
-                                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-all duration-200 hover:scale-110 active:scale-95"
+                                            className="px-6 py-2.5 text-gray-700 bg-white hover:bg-gray-100 border-2 border-gray-300 rounded-lg font-semibold transition-all duration-200"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
+                                            Close
                                         </button>
                                     </div>
-                                </div>
-
-                                {/* Modal Body */}
-                                <div className="p-6 space-y-6">
-                                    {/* Query ID and Status */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-gray-50 rounded-xl p-4">
-                                            <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Query ID</p>
-                                            <p className="font-mono text-lg font-semibold text-gray-900">{detailsQuery._id.slice(-6).toUpperCase()}</p>
-                                        </div>
-                                        <div className="bg-gray-50 rounded-xl p-4">
-                                            <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Status</p>
-                                            <div className="flex items-center">
-                                                {/* Import PremiumStatusBadge equivalent here */}
-                                                <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${detailsQuery.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' :
-                                                    detailsQuery.status === 'Dismantled' ? 'bg-rose-100 text-rose-800' :
-                                                        detailsQuery.status === 'Assigned' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-amber-100 text-amber-800'
-                                                    }`}>
-                                                    {detailsQuery.status}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Issue Description */}
-                                    <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
-                                        <p className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-2">Your Query</p>
-                                        <p className="text-gray-900 text-base leading-relaxed">{detailsQuery.issue}</p>
-                                    </div>
-
-                                    {/* Assigned To */}
-                                    {detailsQuery.assignedTo && (
-                                        <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border-2 border-blue-300">
-                                            <p className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3 block">Assigned To</p>
-                                            <div className="flex items-center gap-3 bg-white rounded-lg p-3 border border-blue-100">
-                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold flex-shrink-0">
-                                                    {detailsQuery.assignedTo.name.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="font-semibold text-gray-900 truncate">{detailsQuery.assignedTo.name}</p>
-                                                    <p className="text-xs text-gray-500 truncate">{detailsQuery.assignedTo.email}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Resolution or Dismantle Reason */}
-                                    {detailsQuery.status === 'Resolved' && detailsQuery.reply && (
-                                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border-2 border-emerald-300 relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 rounded-full -mr-16 -mt-16"></div>
-                                            <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-200/20 rounded-full -ml-12 -mb-12"></div>
-                                            <div className="relative">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
-                                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                    </div>
-                                                    <p className="text-sm font-bold text-emerald-900 uppercase tracking-wider">Resolution from {detailsQuery.assignedTo?.name || 'Head'}</p>
-                                                </div>
-                                                <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
-                                                    <p className="text-gray-800 text-base leading-relaxed italic">"{detailsQuery.reply}"</p>
-                                                </div>
-                                                <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700">
-                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                                                    </svg>
-                                                    <span>Resolved on {new Date(detailsQuery.updatedAt).toLocaleDateString()}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {detailsQuery.status === 'Dismantled' && detailsQuery.reply && (
-                                        <div className="bg-gradient-to-br from-rose-50 to-red-50 rounded-2xl p-5 border-2 border-rose-300 relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-200/20 rounded-full -mr-16 -mt-16"></div>
-                                            <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-200/20 rounded-full -ml-12 -mb-12"></div>
-                                            <div className="relative">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center">
-                                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                                        </svg>
-                                                    </div>
-                                                    <p className="text-sm font-bold text-rose-900 uppercase tracking-wider">Query Dismantled by {detailsQuery.assignedTo?.name || 'Admin'}</p>
-                                                </div>
-                                                <div className="bg-white rounded-xl p-4 shadow-sm border border-rose-100">
-                                                    <p className="text-gray-800 text-base leading-relaxed italic">"{detailsQuery.reply}"</p>
-                                                </div>
-                                                <div className="mt-3 flex items-center gap-2 text-xs text-rose-700">
-                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                                                    </svg>
-                                                    <span>Dismantled on {new Date(detailsQuery.updatedAt).toLocaleDateString()}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Timestamps */}
-                                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                                        <div>
-                                            <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Submitted</p>
-                                            <p className="text-sm text-gray-900">{new Date(detailsQuery.createdAt).toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Last Updated</p>
-                                            <p className="text-sm text-gray-900">{new Date(detailsQuery.updatedAt).toLocaleString()}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Modal Footer */}
-                                <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
-                                    <button
-                                        onClick={() => setDetailsQuery(null)}
-                                        className="px-6 py-2.5 text-gray-700 bg-white hover:bg-gray-100 border-2 border-gray-300 rounded-lg font-semibold transition-all duration-200"
-                                    >
-                                        Close
-                                    </button>
                                 </div>
                             </div>
                         </div>

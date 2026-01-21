@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +12,11 @@ const Signup = () => {
 
     const [error, setError] = useState('');
     const [showPin, setShowPin] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [sendOtpLoading, setSendOtpLoading] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [otpMessage, setOtpMessage] = useState('');
+    const [verifiedOTP, setVerifiedOTP] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -45,12 +50,19 @@ const Signup = () => {
             return;
         }
 
+        // User must verify OTP before creating account
+        if (!verifiedOTP) {
+            setError('Please verify your email with the 6-digit code sent to your inbox');
+            return;
+        }
+
         try {
             const requestBody = {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
-                role: formData.role
+                role: formData.role,
+                otp: verifiedOTP
             };
 
             // Include PIN only if role is Admin or Head
@@ -87,6 +99,50 @@ const Signup = () => {
         }
     };
 
+    const handleSendOTP = async (e) => {
+        e && e.preventDefault && e.preventDefault();
+        setError('');
+        setOtpMessage('');
+        
+        if (!formData.email) {
+            setError('Please enter your email before requesting a verification code');
+            return;
+        }
+
+        try {
+            setSendOtpLoading(true);
+            const response = await fetch('http://localhost:5001/api/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setOtpSent(true);
+                setOtpMessage(data.message || 'Verification code sent to your email');
+                if (data.otp) console.log('Dev OTP:', data.otp);
+            } else {
+                setError(data.message || 'Failed to send verification code');
+            }
+        } catch (err) {
+            console.error('Send OTP error:', err);
+            setError('Network error. Please try again.');
+        } finally {
+            setSendOtpLoading(false);
+        }
+    };
+
+    const handleVerifyOTP = () => {
+        if (!otp || otp.length !== 6) {
+            setError('Please enter a valid 6-digit verification code');
+            return;
+        }
+        setVerifiedOTP(otp);
+        setError('');
+        setOtpMessage('✓ Email verified! You can now create your account.');
+    };
+
     return (
         <div className="min-h-screen bg-linear-to-br from-gray-50 via-indigo-50/30 to-purple-50/30 flex items-center justify-center p-4">
             {/* Animated background elements */}
@@ -111,8 +167,15 @@ const Signup = () => {
                         </div>
                     )}
 
+                    {/* Success Message */}
+                    {otpMessage && !error && (
+                        <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p className="text-green-600 text-sm">{otpMessage}</p>
+                        </div>
+                    )}
+
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form id="signup-form" onSubmit={handleSubmit} className="space-y-6">
                         {/* Name Input */}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -219,13 +282,52 @@ const Signup = () => {
                             </div>
                         )}
 
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
-                        >
-                            Create Account
-                        </button>
+                        {/* OTP Input (shown after OTP is sent but not verified yet) */}
+                        {otpSent && !verifiedOTP && (
+                            <div className="space-y-3">
+                                <div>
+                                    <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Enter 6-Digit Verification Code
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="otp"
+                                        maxLength={6}
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                        placeholder="000000"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-center text-2xl font-bold tracking-widest text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleSendOTP}
+                                    disabled={sendOtpLoading}
+                                    className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all"
+                                >
+                                    Resend Code
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Single Button - Changes based on state */}
+                        {!verifiedOTP ? (
+                            <button
+                                type="button"
+                                onClick={otpSent ? handleVerifyOTP : handleSendOTP}
+                                disabled={sendOtpLoading || !formData.email || (otpSent && otp.length !== 6)}
+                                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
+                            >
+                                {sendOtpLoading ? 'Sending...' : otpSent ? 'Verify Email' : 'Verify Email'}
+                            </button>
+                        ) : (
+                            <button
+                                type="submit"
+                                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
+                            >
+                                Create Account
+                            </button>
+                        )}
                     </form>
 
                     {/* Footer */}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PasswordReset from '../components/PasswordReset';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -7,13 +8,15 @@ const Login = () => {
         role: 'User',
         pin: ''
     });
+    
+    const [showPin, setShowPin] = useState(false);
 
     const [error, setError] = useState('');
-    const [showPin, setShowPin] = useState(false);
+    const [showPasswordReset, setShowPasswordReset] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
+        
         if (name === 'role') {
             setShowPin(value === 'Admin' || value === 'Head');
             setFormData({
@@ -34,13 +37,24 @@ const Login = () => {
         e.preventDefault();
 
         try {
+            const requestBody = {
+                email: formData.email,
+                password: formData.password,
+                role: formData.role
+            };
+            
+            // Include PIN only if role is Admin or Head
+            if (formData.role === 'Admin' || formData.role === 'Head') {
+                requestBody.pin = formData.pin;
+            }
+
             const response = await fetch('http://localhost:5001/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(formData),
+                body: JSON.stringify(requestBody),
             });
 
             const data = await response.json();
@@ -145,7 +159,7 @@ const Login = () => {
                         {showPin && (
                             <div className="animate-slide-up">
                                 <label htmlFor="pin" className="block text-sm font-medium text-gray-700 mb-2">
-                                    PIN <span className="text-indigo-600">(Required for {formData.role})</span>
+                                    Authorization PIN <span className="text-indigo-600">(Required for {formData.role})</span>
                                 </label>
                                 <input
                                     type="password"
@@ -157,7 +171,7 @@ const Login = () => {
                                     className="w-full px-4 py-3 bg-gray-50 border border-indigo-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
                                     placeholder="Enter your authorization PIN"
                                 />
-                                <p className="mt-1 text-xs text-gray-500">Contact HR if you don't have a PIN</p>
+                                <p className="mt-1 text-xs text-gray-500">Contact admin if you don't have a PIN</p>
                             </div>
                         )}
 
@@ -172,9 +186,13 @@ const Login = () => {
 
                     {/* Footer */}
                     <div className="mt-6 text-center space-y-3">
-                        <a href="#" className="block text-sm text-gray-600 hover:text-indigo-600 transition duration-200">
-                            Forgot your password?
-                        </a>
+                        <button
+                            type="button"
+                            onClick={() => setShowPasswordReset(true)}
+                            className="block w-full text-sm text-gray-600 hover:text-indigo-600 transition duration-200"
+                        >
+                            Forgot Password?
+                        </button>
                         <p className="text-sm text-gray-600">
                             Don't have an account?{' '}
                             <a href="#signup" className="text-indigo-600 hover:text-indigo-700 font-medium transition duration-200">
@@ -184,6 +202,17 @@ const Login = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Password Reset Modal */}
+            {showPasswordReset && (
+                <PasswordReset
+                    isOpen={showPasswordReset}
+                    onClose={() => setShowPasswordReset(false)}
+                    onSuccess={() => {
+                        setShowPasswordReset(false);
+                    }}
+                />
+            )}
         </div>
     );
 };

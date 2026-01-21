@@ -4,7 +4,7 @@
 const mongoose = require('mongoose');
 const Member = require('./models/Member');
 const Query = require('./models/Query');
-require('dotenv').config();
+// require('dotenv').config();
 
 const fixLeaderboardData = async () => {
     try {

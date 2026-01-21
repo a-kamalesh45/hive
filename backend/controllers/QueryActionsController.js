@@ -1,5 +1,6 @@
 const Query = require('../models/Query');
 const Member = require('../models/Member');
+const { createTransporter, getResolutionEmailHTML } = require('../config/email');
 
 // Resolve a query (Head and Admin only)
 const resolveQuery = async (req, res) => {
@@ -19,7 +20,8 @@ const resolveQuery = async (req, res) => {
         // - Head: Can only resolve queries assigned to them
         // - Admin: Can resolve any query (assigned or unassigned)
         if (req.user.role === 'Head') {
-            if (!query.assignedTo || query.assignedTo.toString() !== req.user._id.toString()) {
+            const userId = req.user.id || req.user._id;
+            if (!query.assignedTo || query.assignedTo.toString() !== userId.toString()) {
                 return res.status(403).json({
                     success: false,
                     message: 'You can only resolve queries assigned to you'
@@ -49,7 +51,7 @@ const resolveQuery = async (req, res) => {
         // - If admin resolves, credit admin (regardless of assignment)
         // - If head resolves their own query, credit head
 
-        const resolverId = req.user._id; // Person who is resolving
+        const resolverId = req.user.id || req.user._id; // Person who is resolving
         const wasAssigned = query.assignedTo;
 
         if (req.user.role === 'Admin') {
@@ -80,6 +82,29 @@ const resolveQuery = async (req, res) => {
         const updatedQuery = await Query.findById(queryId)
             .populate('askedBy', 'name email role')
             .populate('assignedTo', 'name email role');
+
+        // Send notification email to the participant who asked the query
+        try {
+            const resolverId = req.user.id || req.user._id;
+            const resolver = await Member.findById(resolverId).select('name email');
+            const resolverName = (resolver && resolver.name) ? resolver.name : 'HIVE Team';
+
+            if (updatedQuery && updatedQuery.askedBy && updatedQuery.askedBy.email) {
+                const transporter = createTransporter();
+                const mailOptions = {
+                    from: `"HIVE Query Management" <${process.env.EMAIL_USER}>`,
+                    to: updatedQuery.askedBy.email,
+                    subject: `Your query has been resolved - ${updatedQuery._id}`,
+                    html: getResolutionEmailHTML(updatedQuery, resolverName)
+                };
+
+                transporter.sendMail(mailOptions).catch(err => {
+                    console.error('Failed to send resolution email:', err && err.message ? err.message : err);
+                });
+            }
+        } catch (emailErr) {
+            console.error('Error while sending resolution email:', emailErr && emailErr.message ? emailErr.message : emailErr);
+        }
 
         return res.status(200).json({
             success: true,
@@ -114,7 +139,8 @@ const dismantleQuery = async (req, res) => {
         // - Head: Can only dismantle queries assigned to them
         // - Admin: Can dismantle any query (assigned or unassigned)
         if (req.user.role === 'Head') {
-            if (!query.assignedTo || query.assignedTo.toString() !== req.user._id.toString()) {
+            const userId = req.user.id || req.user._id;
+            if (!query.assignedTo || query.assignedTo.toString() !== userId.toString()) {
                 return res.status(403).json({
                     success: false,
                     message: 'You can only dismantle queries assigned to you'

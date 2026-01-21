@@ -134,7 +134,7 @@ const Pricing = () => {
                                     <div className="text-sm font-semibold text-gray-900 mb-4">What's included:</div>
                                     {plan.features.map((feature, featureIdx) => (
                                         <div key={featureIdx} className="flex items-start">
-                                            <CheckIcon className="w-5 h-5 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
+                                            <CheckIcon className="w-5 h-5 text-amber-600 mr-3 shrink-0 mt-0.5" />
                                             <span className="text-gray-700 text-sm">{feature}</span>
                                         </div>
                                     ))}

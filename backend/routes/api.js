@@ -6,11 +6,16 @@ const { newQuery } = require('../controllers/AddQueryController');
 const { signup } = require('../controllers/SignUpController');
 const { getQueries, getQueryStats } = require('../controllers/GetQueriesController');
 const { resolveQuery, dismantleQuery, assignQuery, getHeads, getLeaderboard } = require('../controllers/QueryActionsController');
+const { sendOTP, verifyOTPCode } = require('../controllers/EmailController');
+const { resetPassword } = require('../controllers/PasswordResetController');
 const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 // Public routes
 router.post('/login', login);
 router.post('/signup', signup);
+router.post('/send-otp', sendOTP);
+router.post('/verify-otp', verifyOTPCode);
+router.post('/reset-password', resetPassword);
 
 // Protected routes - All authenticated users
 router.post('/add-query', authenticate, newQuery);
