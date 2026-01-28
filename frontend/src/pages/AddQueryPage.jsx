@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlusCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import beePng from '../assets/bee.png';
 
 const AddQuery = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         issue: '',
         category: 'Technical',
@@ -58,7 +60,7 @@ const AddQuery = () => {
 
             if (!token) {
                 setError('Please login to submit a query');
-                setTimeout(() => window.location.hash = '#login', 2000);
+                setTimeout(() => navigate('/login'), 2000);
                 return;
             }
 
@@ -86,7 +88,7 @@ const AddQuery = () => {
                 });
                 // Redirect to dashboard after 2 seconds
                 setTimeout(() => {
-                    window.location.hash = '#dashboard';
+                    navigate('/dashboard');
                 }, 2000);
             } else {
                 setError(data.message || 'Failed to submit query');
@@ -208,7 +210,7 @@ const AddQuery = () => {
                         <div className="flex items-center justify-between pt-4">
                             <button
                                 type="button"
-                                onClick={() => window.location.hash = '#dashboard'}
+                                onClick={() => navigate('/dashboard')}
                                 className="px-6 py-3 text-amber-700 hover:text-amber-900 font-medium rounded-lg hover:bg-amber-50 transition-all duration-200"
                             >
                                 Cancel

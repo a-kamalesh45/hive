@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { HexagonBackground } from '../components/hexabg';
 
 const Signup = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -88,9 +91,7 @@ const Signup = () => {
                 localStorage.setItem('user', JSON.stringify(data.user));
 
                 // Redirect to dashboard on success
-                window.location.hash = '#dashboard';
-                // Force reload to update navbar
-                window.location.reload();
+                navigate('/dashboard');
             } else {
                 setError(data.message || 'Signup failed');
             }
@@ -146,15 +147,10 @@ const Signup = () => {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 via-indigo-50/30 to-purple-50/30 flex items-center justify-center p-4">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700"></div>
-            </div>
-
-            {/* Card */}
-            <div className="relative w-full max-w-md">
+        <HexagonBackground>
+            <div className="min-h-screen flex items-center justify-center p-4">
+                {/* Card */}
+                <div className="relative w-full max-w-md">
                 <div className="relative bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
                     {/* Header */}
                     <div className="mb-8 text-center">
@@ -190,7 +186,7 @@ const Signup = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:border-transparent transition duration-200"
                                 placeholder="John Doe"
                             />
                         </div>
@@ -207,7 +203,7 @@ const Signup = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:border-transparent transition duration-200"
                                 placeholder="you@example.com"
                             />
                         </div>
@@ -224,7 +220,7 @@ const Signup = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:border-transparent transition duration-200"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -241,7 +237,7 @@ const Signup = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:border-transparent transition duration-200"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -256,7 +252,7 @@ const Signup = () => {
                                 name="role"
                                 value={formData.role}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 cursor-pointer"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:border-transparent transition duration-200 cursor-pointer"
                             >
                                 <option value="User">User</option>
                                 <option value="Admin">Admin</option>
@@ -268,7 +264,7 @@ const Signup = () => {
                         {showPin && (
                             <div className="animate-slide-up">
                                 <label htmlFor="pin" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Authorization PIN <span className="text-indigo-600">(Required for {formData.role})</span>
+                                    Authorization PIN <span className="text-[#DCA54C]">(Required for {formData.role})</span>
                                 </label>
                                 <input
                                     type="password"
@@ -277,7 +273,7 @@ const Signup = () => {
                                     value={formData.pin}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 bg-gray-50 border border-indigo-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-[#DCA54C]/30 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:border-transparent transition duration-200"
                                     placeholder="Enter your authorization PIN"
                                 />
                                 <p className="mt-1 text-xs text-gray-500">Contact HR if you don't have a PIN</p>
@@ -318,14 +314,14 @@ const Signup = () => {
                                 type="button"
                                 onClick={otpSent ? handleVerifyOTP : handleSendOTP}
                                 disabled={sendOtpLoading || !formData.email || (otpSent && otp.length !== 6)}
-                                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
+                                className="w-full py-3 px-4 bg-[#DCA54C] hover:bg-[#C8933F] disabled:bg-gray-400 disabled:cursor-not-allowed text-[#1A1A1A] font-bold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:ring-offset-2 transition-all duration-200"
                             >
                                 {sendOtpLoading ? 'Sending...' : otpSent ? 'Verify Email' : 'Verify Email'}
                             </button>
                         ) : (
                             <button
                                 type="submit"
-                                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
+                                className="w-full py-3 px-4 bg-[#DCA54C] hover:bg-[#C8933F] text-[#1A1A1A] font-bold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#DCA54C] focus:ring-offset-2 transition-all duration-200"
                             >
                                 Create Account
                             </button>
@@ -336,14 +332,15 @@ const Signup = () => {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
                             Already have an account?{' '}
-                            <a href="#login" className="text-indigo-600 hover:text-indigo-700 font-medium transition duration-200">
+                            <Link to="/login" className="text-[#DCA54C] hover:text-[#C8933F] font-medium transition duration-200">
                                 Sign in
-                            </a>
+                            </Link>
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
+        </HexagonBackground>
     );
 };
 

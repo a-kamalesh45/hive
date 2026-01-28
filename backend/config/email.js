@@ -205,11 +205,11 @@ const getOTPEmailHTML = (otp, userName = 'User') => {
     `;
 };
 
-// HTML template for resolution notifications
+// HTML template for resolution notifications (Minimalistic)
 const getResolutionEmailHTML = (query, resolverName = 'Team') => {
-    const title = `Your query has been resolved: ${query.title || 'Query update'}`;
+    const queryId = query._id ? query._id.toString().slice(-6).toUpperCase() : 'N/A';
     const reply = query.reply || 'Your query has been resolved by our team.';
-    const askedBy = (query.askedBy && (query.askedBy.name || query.askedBy.email)) || 'Participant';
+    const askedBy = (query.askedBy && (query.askedBy.name || query.askedBy.email)) || 'there';
 
     return `
         <!DOCTYPE html>
@@ -217,32 +217,118 @@ const getResolutionEmailHTML = (query, resolverName = 'Team') => {
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>${title}</title>
+            <title>Query Resolved</title>
             <style>
-                body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f6f8fb; margin:0; }
-                .card { max-width:640px; margin:36px auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(2,6,23,0.08); }
-                .header { padding:28px; background:linear-gradient(90deg,#6d28d9,#4f46e5); color:white }
-                .content { padding:28px; color:#0f172a }
-                .reply { background:#f3f4f6; padding:16px; border-radius:8px; margin-top:12px; color:#111827 }
-                .footer { padding:20px; font-size:13px; color:#6b7280; background:#fafafa }
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f9fafb; margin:0; padding:20px; }
+                .container { max-width:600px; margin:0 auto; background:white; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+                .header { padding:24px; background:#10b981; color:white; }
+                .content { padding:32px 24px; color:#111827; line-height:1.6; }
+                .query-box { background:#f3f4f6; padding:16px; border-radius:6px; margin:16px 0; border-left:3px solid #10b981; }
+                .footer { padding:16px 24px; font-size:12px; color:#6b7280; background:#f9fafb; text-align:center; }
+                .button { display:inline-block; padding:12px 24px; background:#10b981; color:white; text-decoration:none; border-radius:6px; margin-top:16px; }
             </style>
         </head>
         <body>
-            <div class="card">
+            <div class="container">
                 <div class="header">
-                    <h2 style="margin:0;font-size:20px">${title}</h2>
-                    <p style="margin:6px 0 0;opacity:0.9;font-size:13px">Resolved by ${resolverName}</p>
+                    <h2 style="margin:0; font-size:20px; font-weight:600;">Query Resolved</h2>
+                    <p style="margin:8px 0 0; opacity:0.95; font-size:14px;">Query #${queryId}</p>
                 </div>
                 <div class="content">
-                    <p>Hi ${askedBy},</p>
-                    <p>${reply}</p>
-                    <div class="reply">
-                        <strong>Resolution details:</strong>
-                        <p style="margin:8px 0 0">${reply}</p>
+                    <p style="margin:0 0 16px;">Hi ${askedBy},</p>
+                    <p style="margin:0 0 16px;">Your query has been successfully resolved by <strong>${resolverName}</strong>.</p>
+                    <div class="query-box">
+                        <p style="margin:0; font-size:14px;">${reply}</p>
                     </div>
-                    <p style="margin-top:18px">You can view the full details in your HIVE dashboard.</p>
+                    <p style="margin:16px 0 0;">Thank you for using HIVE Query Management.</p>
                 </div>
-                <div class="footer">This is an automated message from HIVE. Do not reply to this email.</div>
+                <div class="footer">This is an automated message. Please do not reply to this email.</div>
+            </div>
+        </body>
+        </html>
+        `;
+};
+
+// HTML template for assignment notification to head (Minimalistic)
+const getAssignmentEmailHTML = (query, headName = 'there') => {
+    const queryId = query._id ? query._id.toString().slice(-6).toUpperCase() : 'N/A';
+    const issue = query.issue || 'No description provided';
+    const askedByName = (query.askedBy && query.askedBy.name) || 'A participant';
+
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>New Query Assigned</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f9fafb; margin:0; padding:20px; }
+                .container { max-width:600px; margin:0 auto; background:white; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+                .header { padding:24px; background:#f59e0b; color:white; }
+                .content { padding:32px 24px; color:#111827; line-height:1.6; }
+                .query-box { background:#fffbeb; padding:16px; border-radius:6px; margin:16px 0; border-left:3px solid #f59e0b; }
+                .footer { padding:16px 24px; font-size:12px; color:#6b7280; background:#f9fafb; text-align:center; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2 style="margin:0; font-size:20px; font-weight:600;">New Query Assigned</h2>
+                    <p style="margin:8px 0 0; opacity:0.95; font-size:14px;">Query #${queryId}</p>
+                </div>
+                <div class="content">
+                    <p style="margin:0 0 16px;">Hi ${headName},</p>
+                    <p style="margin:0 0 16px;">A new query has been assigned to you by the admin.</p>
+                    <div class="query-box">
+                        <p style="margin:0 0 8px; font-size:12px; color:#92400e; font-weight:600; text-transform:uppercase;">Query Details</p>
+                        <p style="margin:0; font-size:14px;"><strong>From:</strong> ${askedByName}</p>
+                        <p style="margin:8px 0 0; font-size:14px;"><strong>Issue:</strong> ${issue}</p>
+                    </div>
+                    <p style="margin:16px 0 0;">Please check your HIVE dashboard to view and resolve this query.</p>
+                </div>
+                <div class="footer">This is an automated message. Please do not reply to this email.</div>
+            </div>
+        </body>
+        </html>
+        `;
+};
+
+// HTML template for head assignment notification to user (Minimalistic)
+const getHeadAssignedEmailHTML = (query, headName = 'a team member', userName = 'there') => {
+    const queryId = query._id ? query._id.toString().slice(-6).toUpperCase() : 'N/A';
+
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>Head Assigned to Your Query</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f9fafb; margin:0; padding:20px; }
+                .container { max-width:600px; margin:0 auto; background:white; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+                .header { padding:24px; background:#3b82f6; color:white; }
+                .content { padding:32px 24px; color:#111827; line-height:1.6; }
+                .info-box { background:#eff6ff; padding:16px; border-radius:6px; margin:16px 0; border-left:3px solid #3b82f6; }
+                .footer { padding:16px 24px; font-size:12px; color:#6b7280; background:#f9fafb; text-align:center; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2 style="margin:0; font-size:20px; font-weight:600;">Head Assigned</h2>
+                    <p style="margin:8px 0 0; opacity:0.95; font-size:14px;">Query #${queryId}</p>
+                </div>
+                <div class="content">
+                    <p style="margin:0 0 16px;">Hi ${userName},</p>
+                    <p style="margin:0 0 16px;">Good news! Your query has been assigned to a team head for resolution.</p>
+                    <div class="info-box">
+                        <p style="margin:0; font-size:14px;"><strong>Assigned to:</strong> ${headName}</p>
+                    </div>
+                    <p style="margin:16px 0 0;">They will review and resolve your query soon. You'll be notified once it's resolved.</p>
+                </div>
+                <div class="footer">This is an automated message. Please do not reply to this email.</div>
             </div>
         </body>
         </html>
@@ -290,7 +376,9 @@ module.exports = {
     getOTPEmailHTML,
     storeOTP,
     verifyOTP,
-    getResolutionEmailHTML
+    getResolutionEmailHTML,
+    getAssignmentEmailHTML,
+    getHeadAssignedEmailHTML
 };
 
 

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import {
     CreditCardIcon,
     CheckIcon,
@@ -69,7 +70,7 @@ const Pricing = () => {
             }} />
             <img src={beePng} alt="" className="absolute top-20 right-10 w-40 h-40 opacity-[0.02] pointer-events-none" />
             <img src={beePng} alt="" className="absolute bottom-20 left-10 w-32 h-32 opacity-[0.02] pointer-events-none" />
-            
+
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
                 <div className="text-center mb-16">
@@ -120,15 +121,15 @@ const Pricing = () => {
                                     </div>
                                 </div>
 
-                                <a
-                                    href={plan.name === 'Enterprise' ? '#contact' : '#dashboard'}
+                                <Link
+                                    to={plan.name === 'Enterprise' ? '/contact' : '/dashboard'}
                                     className={`block w-full py-3.5 px-6 text-center font-semibold rounded-xl transition-all duration-300 mb-8 ${plan.popular
-                                            ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transform hover:scale-105'
-                                            : 'bg-white hover:bg-amber-50 text-amber-700 border-2 border-amber-300 hover:border-amber-400'
+                                        ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transform hover:scale-105'
+                                        : 'bg-white hover:bg-amber-50 text-amber-700 border-2 border-amber-300 hover:border-amber-400'
                                         }`}
                                 >
                                     {plan.cta}
-                                </a>
+                                </Link>
 
                                 <div className="space-y-4">
                                     <div className="text-sm font-semibold text-gray-900 mb-4">What's included:</div>

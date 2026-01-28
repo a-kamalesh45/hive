@@ -1,5 +1,6 @@
 // Navbar.jsx
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Bars3Icon,
     XMarkIcon,
@@ -10,6 +11,7 @@ import {
 import logo from '../assets/logo2.png';
 
 const Navbar = () => {
+    const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState('');
@@ -59,15 +61,13 @@ const Navbar = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        window.location.hash = '#home';
-        window.location.reload();
+        navigate('/');
     };
 
     const navLinks = [
-        { name: 'Dashboard', href: '#dashboard' },
-        { name: 'Features', href: '#features' },
-        { name: 'Pricing', href: '#pricing' },
+        { name: 'Dashboard', href: '/dashboard' },
+        { name: 'Features', href: '/features' },
+        { name: 'Pricing', href: '/pricing' },
     ];
 
     return (
@@ -77,7 +77,7 @@ const Navbar = () => {
                 className="w-full max-w-7xl bg-[#1A1A1A] border-2 border-[#DCA54C] rounded-full shadow-[6px_6px_0px_0px_#DCA54C] py-3 px-6 md:px-8 flex items-center justify-between transition-transform duration-200"
             >
                 {/* --- 1. LEFT: LOGO --- */}
-                <div className="flex items-center gap-3 cursor-pointer select-none group" onClick={() => window.location.hash = '#home'}>
+                <div className="flex items-center gap-3 cursor-pointer select-none group" onClick={() => navigate('/')}>
                     <div className="relative">
                         <img src={logo} alt="HIVE Logo" className="w-9 h-9 object-contain relative z-10 transition-transform group-hover:rotate-12" />
                         {/* Little decorative blob behind logo */}
@@ -93,9 +93,9 @@ const Navbar = () => {
                     {/* Standard Links */}
                     <div className="flex items-center gap-1 bg-black/20 rounded-full px-2 py-1 border border-white/5">
                         {navLinks.map((link) => (
-                            <a
+                            <Link
                                 key={link.name}
-                                href={link.href}
+                                to={link.href}
                                 className="text-sm font-bold text-gray-400 px-4 py-2 rounded-full
            hover:text-[#DCA54C]
            hover:shadow-[inset_0_-2px_0_0_#DCA54C]
@@ -105,14 +105,14 @@ const Navbar = () => {
 
                             >
                                 {link.name}
-                            </a>
+                            </Link>
                         ))}
                     </div>
 
                     {/* "Add Query" - The 'Eye Catchy' 3D Button */}
                     {isLoggedIn && (
-                        <a
-                            href="#add-query"
+                        <Link
+                            to="/add-query"
                             className="flex items-center gap-2 text-sm font-black
                             text-[#DCA54C]
                             bg-[#1F1F1F]
@@ -127,8 +127,7 @@ const Navbar = () => {
                         >
                             <PlusIcon className="w-5 h-5 stroke-3 text-[#DCA54C]" />
                             ADD QUERY
-                        </a>
-
+                        </Link>
                     )}
                 </div>
 
@@ -137,15 +136,15 @@ const Navbar = () => {
                     {isLoggedIn ? (
                         // LOGGED IN: Profile + Logout
                         <div className="flex items-center gap-4">
-                            <a
-                                href="#profile"
+                            <Link
+                                to="/profile"
                                 className="flex items-center gap-3 bg-[#2A2A2A] border border-[#DCA54C]/30 px-3 py-1.5 rounded-full hover:border-[#DCA54C] hover:bg-[#3A3A3A] transition-all"
                             >
                                 <span className="text-sm font-bold text-[#DCA54C] px-1">{userName}</span>
                                 <div className="w-8 h-8 rounded-full bg-[#DCA54C] flex items-center justify-center border border-white">
                                     <UserCircleIcon className="w-6 h-6 text-[#1A1A1A]" />
                                 </div>
-                            </a>
+                            </Link>
                             <button
                                 onClick={handleLogout}
                                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -156,21 +155,21 @@ const Navbar = () => {
                         </div>
                     ) : (
                         // LOGGED OUT: Login + Signup
-                        <>
-                            <a
-                                href="#login"
+                        <div className="flex items-center gap-4">
+                            <Link
+                                to="/login"
                                 className="text-sm font-bold text-gray-300 hover:text-[#DCA54C] px-2 hover:underline decoration-[#DCA54C] decoration-2 underline-offset-4 transition-all"
                             >
                                 Sign In
-                            </a>
-                            <a
-                                href="#signup"
+                            </Link>
+                            <Link
+                                to="/signup"
                                 // White 3D Button for Signup
                                 className="text-sm font-bold text-[#1A1A1A] bg-white border-2 border-[#DCA54C] px-6 py-2 rounded-full shadow-[4px_4px_0px_0px_#DCA54C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_#DCA54C] transition-all"
                             >
                                 Sign Up
-                            </a>
-                        </>
+                            </Link>
+                        </div>
                     )}
                 </div>
 
@@ -189,28 +188,28 @@ const Navbar = () => {
             {mobileMenuOpen && (
                 <div className="absolute top-28 left-4 right-4 bg-[#1A1A1A] border-2 border-[#DCA54C] rounded-3xl shadow-[8px_8px_0px_0px_#DCA54C] p-6 flex flex-col gap-4 md:hidden z-40">
                     {navLinks.map((link) => (
-                        <a
+                        <Link
                             key={link.name}
-                            href={link.href}
+                            to={link.href}
                             onClick={() => setMobileMenuOpen(false)}
                             className="text-center font-bold text-gray-300 hover:text-[#1A1A1A] hover:bg-[#DCA54C] py-3 rounded-xl transition-all border border-transparent hover:border-white"
                         >
                             {link.name}
-                        </a>
+                        </Link>
                     ))}
 
                     <div className="h-0.5 bg-[#333] w-full my-2"></div>
 
                     {isLoggedIn && (
-                        <a href="#add-query" className="text-center font-black text-[#1A1A1A] bg-[#DCA54C] border-2 border-white py-3 rounded-xl shadow-[4px_4px_0px_0px_#FFFFFF] active:shadow-none active:translate-y-1 transition-all">
+                        <Link to="/add-query" className="text-center font-black text-[#1A1A1A] bg-[#DCA54C] border-2 border-white py-3 rounded-xl shadow-[4px_4px_0px_0px_#FFFFFF] active:shadow-none active:translate-y-1 transition-all">
                             + ADD QUERY
-                        </a>
+                        </Link>
                     )}
 
                     {!isLoggedIn ? (
                         <div className="grid grid-cols-2 gap-4 mt-2">
-                            <a href="#login" className="text-center font-bold text-white border-2 border-gray-600 py-3 rounded-xl">Sign In</a>
-                            <a href="#signup" className="text-center font-bold text-[#1A1A1A] bg-white border-2 border-[#DCA54C] py-3 rounded-xl shadow-[4px_4px_0px_0px_#DCA54C]">Sign Up</a>
+                            <Link to="/login" className="text-center font-bold text-white border-2 border-gray-600 py-3 rounded-xl">Sign In</Link>
+                            <Link to="/signup" className="text-center font-bold text-[#1A1A1A] bg-white border-2 border-[#DCA54C] py-3 rounded-xl shadow-[4px_4px_0px_0px_#DCA54C]">Sign Up</Link>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-3 mt-2">

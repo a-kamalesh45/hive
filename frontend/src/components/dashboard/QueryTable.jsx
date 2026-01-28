@@ -205,91 +205,13 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                 {/* Actions Area */}
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end items-center h-full min-h-10">
-
-                                        {/* State 1: Show Outcome Message if Inactive */}
-                                        {isInactive ? (
-                                            query.reply ? (
-                                                <div className={`
-                                                    flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium max-w-55 ml-auto
-                                                    ${isResolved
-                                                        ? 'bg-emerald-50/50 border-emerald-100 text-emerald-700'
-                                                        : 'bg-rose-50/50 border-rose-100 text-rose-700'}
-                                                `}>
-                                                    {/* <span className="uppercase font-bold text-[10px] opacity-70">
-                                                        {isResolved ? 'Note:' : 'Reason:'}
-                                                    </span> */}
-                                                    <span className="truncate italic">{query.reply}</span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-xs text-gray-300 font-medium italic pr-2">
-                                                    No remarks
-                                                </span>
-                                            )
-                                        ) : (
-                                            /* State 2: Active Buttons */
-                                            <div className="flex items-center gap-2">
-                                                {/* Agent Indicator (User View) */}
-                                                {userRole === 'User' && query.assignedTo && (
-                                                    <div className="mr-2 text-xs text-right">
-                                                        <span className="block text-gray-400 text-[10px] uppercase">Agent</span>
-                                                        <span className="font-bold text-amber-600">{query.assignedTo.name}</span>
-                                                    </div>
-                                                )}
-
-                                                {/* Details Button (User) */}
-                                                {userRole === 'User' && (
-                                                    <ActionButton
-                                                        onClick={() => onViewDetails && onViewDetails(query)}
-                                                        label="Details"
-                                                        icon={ArrowRightIcon}
-                                                    />
-                                                )}
-
-                                                {/* Head/Admin Actions */}
-                                                {userRole === 'Head' && query.assignedTo?._id === userId && (
-                                                    <>
-                                                        <ActionButton
-                                                            onClick={() => onOpenModal(query, 'dismantle')}
-                                                            label="Dismantle"
-                                                            icon={XCircleIcon}
-                                                            variant="danger"
-                                                        />
-
-                                                        <ActionButton
-                                                            onClick={() => onOpenModal(query, 'resolve')}
-                                                            label="Resolve"
-                                                            icon={CheckCircleIcon}
-                                                            variant="primary"
-                                                        />
-                                                    </>
-                                                )}
-
-                                                {userRole === 'Admin' && (
-                                                    <>
-                                                        <ActionButton
-                                                            onClick={() => onOpenModal(query, 'dismantle')}
-                                                            label="Dismantle"
-                                                            icon={XCircleIcon}
-                                                            variant="danger"
-                                                        />
-
-                                                        <ActionButton
-                                                            onClick={() => onOpenModal(query, 'assign')}
-                                                            label={query.assignedTo ? "Reassign" : "Assign"}
-                                                            icon={query.assignedTo ? ArrowPathIcon : UserCircleIcon}
-                                                            variant="action"
-                                                        />
-
-                                                        <ActionButton
-                                                            onClick={() => onOpenModal(query, 'resolve')}
-                                                            label="Resolve"
-                                                            icon={CheckCircleIcon}
-                                                            variant="primary"
-                                                        />
-                                                    </>
-                                                )}
-                                            </div>
-                                        )}
+                                        {/* Single "View Details" Button for All Logged-in Users */}
+                                        <ActionButton
+                                            onClick={() => onViewDetails && onViewDetails(query)}
+                                            label="View Details"
+                                            icon={ArrowRightIcon}
+                                            variant="neutral"
+                                        />
                                     </div>
                                 </td>
                             </tr>

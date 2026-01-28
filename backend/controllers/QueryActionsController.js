@@ -1,6 +1,6 @@
 const Query = require('../models/Query');
 const Member = require('../models/Member');
-const { createTransporter, getResolutionEmailHTML } = require('../config/email');
+const { createTransporter, getResolutionEmailHTML, getAssignmentEmailHTML, getHeadAssignedEmailHTML } = require('../config/email');
 
 // Resolve a query (Head and Admin only)
 const resolveQuery = async (req, res) => {
@@ -255,6 +255,45 @@ const assignQuery = async (req, res) => {
         const updatedQuery = await Query.findById(queryId)
             .populate('askedBy', 'name email')
             .populate('assignedTo', 'name email role');
+
+        // Send email notifications
+        try {
+            const transporter = createTransporter();
+
+            // 1. Email to the head who is being assigned
+            if (updatedQuery.assignedTo && updatedQuery.assignedTo.email) {
+                const headMailOptions = {
+                    from: `\"HIVE Query Management\" <${process.env.EMAIL_USER}>`,
+                    to: updatedQuery.assignedTo.email,
+                    subject: `New query assigned to you - #${updatedQuery._id.toString().slice(-6).toUpperCase()}`,
+                    html: getAssignmentEmailHTML(updatedQuery, updatedQuery.assignedTo.name)
+                };
+
+                transporter.sendMail(headMailOptions).catch(err => {
+                    console.error('Failed to send assignment email to head:', err && err.message ? err.message : err);
+                });
+            }
+
+            // 2. Email to the user who asked the query
+            if (updatedQuery.askedBy && updatedQuery.askedBy.email) {
+                const userMailOptions = {
+                    from: `\"HIVE Query Management\" <${process.env.EMAIL_USER}>`,
+                    to: updatedQuery.askedBy.email,
+                    subject: `Head assigned to your query - #${updatedQuery._id.toString().slice(-6).toUpperCase()}`,
+                    html: getHeadAssignedEmailHTML(
+                        updatedQuery,
+                        updatedQuery.assignedTo ? updatedQuery.assignedTo.name : 'a team member',
+                        updatedQuery.askedBy.name
+                    )
+                };
+
+                transporter.sendMail(userMailOptions).catch(err => {
+                    console.error('Failed to send head-assigned email to user:', err && err.message ? err.message : err);
+                });
+            }
+        } catch (emailErr) {
+            console.error('Error while sending assignment emails:', emailErr && emailErr.message ? emailErr.message : emailErr);
+        }
 
         return res.status(200).json({
             success: true,

@@ -13,6 +13,18 @@ const sendOTP = async (req, res) => {
             });
         }
 
+        // Check if user already exists before sending OTP (for signup flow)
+        // Password reset flow should set requireExistingUser: true
+        if (!req.body.requireExistingUser) {
+            const userExists = await Member.exists({ email });
+            if (userExists) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'User with this email already exists. Please login instead.'
+                });
+            }
+        }
+
         // Only require existing user when caller explicitly requests it
         // e.g. password reset flow should set `requireExistingUser: true`
         if (req.body.requireExistingUser) {
@@ -42,7 +54,7 @@ const sendOTP = async (req, res) => {
         const mailOptions = {
             from: `"HIVE Query Management" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: '🔐 Your Verification Code - HIVE',
+            subject: 'Your Verification Code - HIVE',
             html: getOTPEmailHTML(otp, recipientName)
         };
 
