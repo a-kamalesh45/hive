@@ -61,7 +61,7 @@ const StatusBadge = ({ status }) => {
 // --- 2. Action Button (Dynamic Equal Widths) ---
 const ActionButton = ({ onClick, label, icon: Icon, variant = 'neutral', title }) => {
     const variants = {
-        neutral: 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:text-amber-700 hover:bg-amber-50',
+        neutral: 'bg-[#DCA54C] text-[#1A1A1A] border-[#DCA54C] hover:bg-[#C8933F] hover:border-[#C8933F] shadow-md hover:shadow-lg',
         primary: 'bg-white text-emerald-700 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
         danger: 'bg-white text-rose-700 border-rose-200 hover:border-rose-400 hover:bg-rose-50',
         action: 'bg-white text-blue-700 border-blue-200 hover:border-blue-400 hover:bg-blue-50',
@@ -73,10 +73,10 @@ const ActionButton = ({ onClick, label, icon: Icon, variant = 'neutral', title }
             title={title}
             // min-w-[6.5rem] ensures "Assign" and "Reassign" are same width
             className={`
-                relative flex items-center justify-center gap-2 px-3 py-1.5 
-                min-w-40 h-9 rounded-lg border shadow-sm 
-                transition-all duration-200 active:scale-95 active:shadow-inner
-                text-xs font-bold uppercase tracking-wide
+                relative flex items-center justify-center gap-2 px-4 py-2 
+                min-w-40 h-10 rounded-lg border-2
+                transition-all duration-200 active:scale-95
+                text-sm font-bold tracking-wide
                 ${variants[variant]}
             `}
         >
@@ -208,7 +208,7 @@ const QueryTable = ({ queries, userRole, userId, onOpenModal, formatTimeAgo, onV
                                         {/* Single "View Details" Button for All Logged-in Users */}
                                         <ActionButton
                                             onClick={() => onViewDetails && onViewDetails(query)}
-                                            label="View Details"
+                                            label="Details"
                                             icon={ArrowRightIcon}
                                             variant="neutral"
                                         />
